@@ -1,79 +1,129 @@
 <!DOCTYPE html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Isis : Task Tracer Parser" />
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Isis</title>
+    <title>Project Isis</title>
+    <link rel="stylesheet" type="text/css" href="style/isis.css">
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+    <script src="js/sinon-1.7.3.js" defer></script>
+    <script src="raphael/raphael.js" defer></script>
+    <script src="color/color.min.js" defer></script>
+    <script src="js/map.js" defer></script>
+    <script src="js/thread.js"></script>
   </head>
-
   <body>
-
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/alivedise/isis">View on GitHub</a>
-
-          <h1 id="project_title">Isis</h1>
-          <h2 id="project_tagline">Task Tracer Parser</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/alivedise/isis/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/alivedise/isis/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          <textarea id="source" rows="20" cols="40" autofocus="" spellcheck="false">
+          {
+            "start": 1073800000,
+            "end": 1073920000,
+            "sourceEvents": [
+            {
+              "sourceEventId": 0,
+              "sourceEventType": 0,
+              "tasks": []
+            },
+            {
+              "sourceEventId": 11223344,
+              "sourceEventType": 1,
+              "tasks": [
+                          {
+                "taskId": 87654321,
+                "processId": 108,
+                "threadId": 108,
+                "dispatch": 1073840000,
+                "start": 1073900000,
+                "end": 1073920000,
+                "delayTime": 60000,
+                "executionTime": 20000
+                          }]
+            },
+            {
+              "sourceEventId": 0,
+              "sourceEventType": 2,
+              "tasks": []
+            },
+            {
+              "sourceEventId": 12345678,
+              "sourceEventType": 3,
+              "tasks": [
+              {
+                "taskId": 11115555,
+                "processId": 108,
+                "threadId": 108,
+                "dispatch": 1073800000,
+                "start": 1073810000,
+                "end": 10738330000,
+                "delayTime": 10000,
+                "executionTime": 20000
+                          },
+              {
+                "taskId": 22226666,
+                "processId": 108,
+                "threadId": 108,
+                "dispatch": 1073820000,
+                "start": 1073835000,
+                "end": 1073850000,
+                "delayTime": 15000,
+                "executionTime": 15000
+                          },
+              {
+                "taskId": 33337777,
+                "processId": 108,
+                "threadId": 722,
+                "dispatch": 1073840000,
+                "start": 1073845000,
+                "end": 1073855000,
+                "delayTime": 5000,
+                "executionTime": 10000
+                          },
+              {
+                "taskId": 11115555,
+                "processId": 110,
+                "threadId": 110,
+                "dispatch": 1073845000,
+                "start": 1073850000,
+                "end": 1073860000,
+                "delayTime": 5000,
+                "executionTime": 10000
+                          },
+              {
+                "taskId": 66667777,
+                "processId": 108,
+                "threadId": 108,
+                "dispatch": 1073855000,
+                "start": 1073860000,
+                "end": 1073870000,
+                "delayTime": 5000,
+                "executionTime": 10000
+                          },
+              {
+                "taskId": 99996666,
+                "processId": 108,
+                "threadId": 108,
+                "dispatch": 1073865000,
+                "start": 1073870000,
+                "end": 1073880000,
+                "delayTime": 5000,
+                "executionTime": 10000
+                          }]
+            },
+            {
+              "sourceEventId": 0,
+              "sourceEventType": 4,
+              "tasks": []
+            }]
+          }
+          </textarea>
+          <button class="btn btn-info" id="random">Random</button>
+          <button class="btn btn-successful" id="parse">Parse</button>
+        </div>
+        <div class="col-md-9">
+          <div id="timeline"></div>
+        </div>
+      </div>
     </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
-
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
-
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
-
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
-
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
-
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Isis maintained by <a href="https://github.com/alivedise">alivedise</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
   </body>
 </html>
