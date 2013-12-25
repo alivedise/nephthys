@@ -46,6 +46,7 @@
     count: 0,
     parseButton: document.getElementById('parse'),
     source: document.getElementById('source'),
+    tooltip: null,
     init: function Isis_init() {
       this.map = Raphael(document.getElementById('timeline'), this.WIDTH, this.HEIGHT);
       source.addEventListener('change', this);
@@ -60,7 +61,7 @@
           break;
         case this.random:
           var self = this;
-          var done = function done() {
+          var done = function done(value) {
             self.source.value = JSON.stringify(TaskTracer.dump());
             self.parse(self.source.value);
           };
@@ -70,8 +71,8 @@
     },
 
     resize: function Isis_resize() {
-      if (this._tasks && this._tasks.length) {
-        this.HEIGHT = (this._tasks.length + 1) * (this._intervalH + this._taskHeight);
+      if (this.currentTasks && this.currentTasks.length) {
+        this.HEIGHT = (this.currentTasks.length + 1) * (this._intervalH + this._taskHeight);
       } else {
         this.HEIGHT = 500;
       }
@@ -81,16 +82,22 @@
     clear: function Isis_clear() {
       this.map.clear();
       this.renderTimeline();
+      this.renderTooltip();
       this.count = 0;
       this.taskSets = {};
       this._colors = {};
+    },
+
+    renderTooltip: function() {
+      this.tooltip = this.map.rect(this.WIDTH - 200, 10, 200, 50);
     },
 
     parse: function Isis_parse(string) {
       this.clear();
       var object = JSON.parse(string);
       this.start = object.start;
-      this.end = object.end;
+      // XXX: fix me
+      this.end = object.end + object.end;
       this.interval = this.end - this.start;
       if (Array.isArray(object.tasks)) {
         this.currentTasks = object.tasks;
@@ -123,7 +130,7 @@
       var c = sourceEventColor;
 
       /** Render latency **/
-      var latency = this.map.rect(lx, y, lw, h);
+      var latency = this.map.rect(lx, y, lw + ew, h);
       latency.attr('fill', c);
       latency.attr('opacity', 0.5);
       latency.attr('stroke', 'transparent');
@@ -133,16 +140,29 @@
       execution.attr('fill', c);
       execution.attr('stroke', 'transparent');
 
-      console.log(lx, ex, lw, ew);
-
       /** Render label **/
       var label = this.map.text(lx + 5, y + this._taskHeight / 2, 'TaskID: ' + task.id).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15).attr(
         'fill', sourceEventColor);
       label.attr('x', label.getBBox().x - label.getBBox().width - 10);
 
-      var thread = this.map.text(5, y, 'ThreadID: ' + task.threadId).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15);
+      if (!this._threadRendered[task.threadId]) {
+        var thread = this.map.text(5, y, 'Thread: ' + ThreadManager.getThreadName(task.threadId) || task.threadId).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15);
+        this._threadRendered[task.threadId] = thread;
+      }
+
 
       var set = this.map.set();
+      var show = function(){
+        if (this.tooltipText) {
+          this.tooltipText.remove();
+        }
+        this.tooltipText = this.map.text(this.WIDTH - 190, 35,
+          'Dispatch: ' + task.dispatch + ' ' + 'Latency: ' + (task.start - task.dispatch) + '\n' +
+          'Start: ' + task.start + ' ' + 'Execution: ' + (task.end - task.start) + '\n' +
+          'End: ' + task.end).attr('text-anchor', 'start');
+      }
+      latency.hover(show, function() { this.tooltipText.remove(); }, this, this);
+      execution.hover(show, function() { this.tooltipText.remove(); }, this, this);
 
       set.push(latency, execution, label);
       this.taskSets[task.id] = {
@@ -169,6 +189,7 @@
 
     render: function() {
       this._colors = {};
+      this._threadRendered = {};
       for (var id in this.currentThreads) {
         var tasks = this.currentThreads[id];
         tasks.forEach(function(task) {
@@ -202,9 +223,9 @@
         mission.forEach(function(task, index) {
           var taskId = task.id;
           var previousTaskId = task.parent;
-          if (previousTaskId >= 0) {
-            var previousTaskSet = this.taskSets[previousTaskId];
-            var currentTaskSet = this.taskSets[taskId];
+          var previousTaskSet = this.taskSets[previousTaskId];
+          var currentTaskSet = this.taskSets[taskId];
+          if (previousTaskSet) {
             var x1 = currentTaskSet.position.x;
             var y1 = previousTaskSet.position.y;
             var x2 = currentTaskSet.position.x;
@@ -224,6 +245,11 @@
     }
   };
   Isis.init();
-  Isis.parse(Isis.source.value);
+
+  var done = function done(value) {
+    Isis.source.value = JSON.stringify(TaskTracer.dump());
+    Isis.parse(Isis.source.value);
+  };
+  TaskTracer.run(done);
   window.Isis = Isis;
 }(this));

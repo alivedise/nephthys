@@ -1,7 +1,6 @@
 (function(window) {
-  var START_FROM_MAIN_THREAD = true;
-  var END_IN_MAIN_THREAD = true;
-  var MAX_EXECUTION_TIME = 100000;
+  var MIN_EXECUTION_TIME = 900000;
+  var MAX_EXECUTION_TIME = 10000000;
   var TIME_FACTOR = 1;
   var DEBUG = false;
   function getRandomElementFromArray(a) {
@@ -13,7 +12,7 @@
   function random(start, end) {
     return Math.round(((start) + Math.random() * (end - start)));
   }
-  var threadNames = ['UI', 'worker', 'BT', 'NFC', 'Telephony', 'Main'];
+  var threadNames = ['UI', 'worker', 'BT', 'NFC', 'Telephony', 'Main', 'IO'];
   var Mission = function Mission() {
     this.tasks = [];
     this.id = this.constructor.id++;
@@ -27,7 +26,7 @@
                    randomCount(previousTask.executionTime);
       var newTask = new Task(
         offset,
-        randomCount(MAX_EXECUTION_TIME),
+        random(MIN_EXECUTION_TIME, MAX_EXECUTION_TIME),
         this.id,
         getRandomElementFromArray(threadNames),
         previousTask
@@ -67,6 +66,7 @@
   };
 
   var Task = function Task(offset, executionTime, sourceEventType, threadName, previousTask) {
+    this.element = document.createElement('div');
     this.offset = offset;
     this.subTasks = [];
     this.executionTime = executionTime;
@@ -99,6 +99,9 @@
 
   Task.prototype.publish = function(evtName) {
     this.debug('publish ' + evtName);
+    this.element.dispatchEvent(new CustomEvent(evtName, {
+      detail: this
+    }));
     window.dispatchEvent(new CustomEvent(this.EVENT_PREFIX + evtName, {
       detail: this
     }));
@@ -168,36 +171,40 @@
 
   Thread.prototype.currentTask = null;
 
+  Thread.prototype.isBusy = function() {
+    var busy = this._tasks.some(function(task) {
+      if (typeof(task.startTime) !== 'undefined' && typeof(task.endTime) == 'undefined') {
+        this.currentTask = task;
+        return true;
+      }
+    }, this);
+    return !!busy;
+  };
+
   Thread.prototype.scheduling = function(task) {
-    if (this.currentTask) {
+    if (this.isBusy()) {
       this._pools.push(task);
     } else {
       this.currentTask = task;
+      task.element.addEventListener('completed', this);
       task.execute();
       this._tasks.push(task);
     }
   };
 
-  Thread.prototype.executeNextTask = function(task) {
-    if (this._pools.length) {
-      var task = this._pools.splice(0, 1)[0];
-      window.setTimeout(task.execute.bind(task), randomCount(1000));
-      this._tasks.push(task);
-    }
-  };
-
   Thread.prototype.handleEvent = function(evt) {
+    var task = evt.detail;
     switch (evt.type) {
       case 'taskdispatched':
-        var task = evt.detail;
         if (task.threadId === this.id) {
           this.scheduling(task);
         }
-      case 'taskcompleted':
-        var task = evt.detail;
-        if (task.threadId === this.id && this.currentTask.id === task.id) {
-          this.currentTask = null;
-          this.executeNextTask();
+        break;
+      case 'completed':
+        task.element.removeEventListener('completed', this);
+        if (this._pools.length) {
+          var next = this._pools.splice(0, 1)[0];
+          this.scheduling(next);
         }
         break;
     }
@@ -233,29 +240,8 @@
       }
       this._inited = true;
       window.addEventListener('threadcreated', this);
-      this.mainThread = new Thread({
-        isMain: true,
-        name: 'Main'
-      });
-
-      this.UIThread = new Thread({
-        name: 'UI'
-      });
-
-      this.TelephonyThread = new Thread({
-        name: 'Telephony'
-      });
-
-      this.BTThread = new Thread({
-        name: 'BT'
-      });
-
-      this.NFCThread = new Thread({
-        name: 'NFC'
-      });
-
-      this.NFCThread = new Thread({
-        name: 'worker'
+      threadNames.forEach(function(name) {
+        new Thread({name: name});
       });
     },
 
@@ -271,6 +257,15 @@
 
     getThreadId: function(name) {
       return this._threads[name].id;
+    },
+
+    getThreadName: function(id) {
+      for (var name in this._threads) {
+        if (this._threads[name].id === id) {
+          return name;
+        }
+      }
+      return '';
     }
   };
 
@@ -289,7 +284,7 @@
 
       clock.restore();
       if (typeof(done) == 'function') {
-        done();
+        setTimeout(done);
       }
     },
     now: function() {
@@ -363,6 +358,7 @@
     }
   };
 
+  window.ThreadManager = ThreadManager;
   window.TaskTracer = TaskTracer;
   window.Mission = Mission;
   window.Task = Task;
