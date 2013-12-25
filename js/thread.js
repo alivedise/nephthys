@@ -1,8 +1,9 @@
 (function(window) {
   var MIN_EXECUTION_TIME = 900000;
-  var MAX_EXECUTION_TIME = 10000000;
+  var MAX_EXECUTION_TIME = 100000000;
   var TIME_FACTOR = 1;
   var DEBUG = false;
+  var MISSION_COUNT = 20;
   function getRandomElementFromArray(a) {
     return a[Math.floor(Math.random() * a.length)];
   }
@@ -16,13 +17,13 @@
   var Mission = function Mission() {
     this.tasks = [];
     this.id = this.constructor.id++;
-    var count = randomCount(10);
+    var count = randomCount(MISSION_COUNT);
     for (var i = 0; i < count + 1; i++) {
       var previousTask = null;
       if (i !== 0) {
         previousTask = getRandomElementFromArray(this.tasks);
       }
-      var offset = (i === 0) ? randomCount(10000) :
+      var offset = (i === 0) ? randomCount(100000000) :
                    randomCount(previousTask.executionTime);
       var newTask = new Task(
         offset,

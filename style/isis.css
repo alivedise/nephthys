@@ -1,4 +1,20 @@
+html, body {
+  height: 100%;
+}
+
 #timeline {
   overflow-y: auto;
   max-height: 800px;
+}
+#content {
+  background-color: #3366CC;
+  color: white;
+}
+textarea {
+  background-color: grey;
+}
+section {
+  padding-top: 20px;
+  background-color: #f0f0f0;
+  height: 100%;
 }

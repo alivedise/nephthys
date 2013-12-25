@@ -14,11 +14,11 @@
    * @param  {Number} size Size of arrow
    * @return {Array}      Array containing line and arrow
    */
-  Raphael.fn.arrow = function (x1, y1, x2, y2, size) {
+  Raphael.fn.arrow = function (x1, y1, x2, y2, size, color) {
     var angle = Math.atan2(x1-x2,y2-y1);
     angle = (angle / (2 * Math.PI)) * 360;
-    var arrowPath = this.path('M' + x2 + ' ' + y2 + ' L' + (x2 - size) + ' ' + (y2 - size) + ' L' + (x2 - size) + ' ' + (y2 + size) + ' L' + x2 + ' ' + y2 ).attr('fill','black').rotate((90+angle),x2,y2);
-    var linePath = this.path('M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2);
+    var arrowPath = this.path('M' + x2 + ' ' + y2 + ' L' + (x2 - size) + ' ' + (y2 - size) + ' L' + (x2 - size) + ' ' + (y2 + size) + ' L' + x2 + ' ' + y2 ).attr('fill', color).attr('opacity', 0.5).rotate((90+angle),x2,y2);
+    var linePath = this.path('M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2).attr('fill', color).attr('opacity', 0.5);
     return [linePath,arrowPath];
   }
 
@@ -40,6 +40,8 @@
     TIME_FACTOR: 0.5,
     WIDTH: 700,
     HEIGHT: 800,
+    LEFT: 150,
+    TOP: 40,
     start: 0,
     end: 0,
     interval: 0,
@@ -89,7 +91,7 @@
     },
 
     renderTooltip: function() {
-      this.tooltip = this.map.rect(this.WIDTH - 200, 10, 200, 50);
+      // this.tooltip = this.map.rect(this.WIDTH - 200, 15, 200, 50);
     },
 
     parse: function Isis_parse(string) {
@@ -117,7 +119,6 @@
 
     renderTimeline: function Isis_renderTimeline() {
       this.map.text(5, 5, 'Time').attr('text-anchor', 'start').attr('color', '#ffffff');
-      this.map.arrow(100, 5, this.WIDTH, 5, 2);
     },
 
     renderTask: function Isis_renderTask(task, sourceEventColor) {
@@ -146,6 +147,7 @@
       label.attr('x', label.getBBox().x - label.getBBox().width - 10);
 
       if (!this._threadRendered[task.threadId]) {
+        var timeline = this.map.arrow(this.LEFT, y - 5, this.WIDTH, y - 5, 2, 'black');
         var thread = this.map.text(5, y, 'Thread: ' + ThreadManager.getThreadName(task.threadId) || task.threadId).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15);
         this._threadRendered[task.threadId] = thread;
       }
@@ -156,7 +158,7 @@
         if (this.tooltipText) {
           this.tooltipText.remove();
         }
-        this.tooltipText = this.map.text(this.WIDTH - 190, 35,
+        this.tooltipText = this.map.text(this.WIDTH - 190, 40,
           'Dispatch: ' + task.dispatch + ' ' + 'Latency: ' + (task.start - task.dispatch) + '\n' +
           'Start: ' + task.start + ' ' + 'Execution: ' + (task.end - task.start) + '\n' +
           'End: ' + task.end).attr('text-anchor', 'start');
@@ -238,7 +240,7 @@
               y1 = y1 + this._taskHeight;
             }
 
-            this.map.arrow(x1, y1, x2, y2, 2);
+            this.map.arrow(x1, y1, x2, y2, 2, this._colors[task.sourceEventType]);
           }
         }, this);
       }

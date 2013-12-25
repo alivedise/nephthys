@@ -12,118 +12,27 @@
     <script src="js/thread.js"></script>
   </head>
   <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-3">
-          <textarea id="source" rows="20" cols="40" autofocus="" spellcheck="false">
-          {
-            "start": 1073800000,
-            "end": 1073920000,
-            "sourceEvents": [
-            {
-              "sourceEventId": 0,
-              "sourceEventType": 0,
-              "tasks": []
-            },
-            {
-              "sourceEventId": 11223344,
-              "sourceEventType": 1,
-              "tasks": [
-                          {
-                "taskId": 87654321,
-                "processId": 108,
-                "threadId": 108,
-                "dispatch": 1073840000,
-                "start": 1073900000,
-                "end": 1073920000,
-                "delayTime": 60000,
-                "executionTime": 20000
-                          }]
-            },
-            {
-              "sourceEventId": 0,
-              "sourceEventType": 2,
-              "tasks": []
-            },
-            {
-              "sourceEventId": 12345678,
-              "sourceEventType": 3,
-              "tasks": [
-              {
-                "taskId": 11115555,
-                "processId": 108,
-                "threadId": 108,
-                "dispatch": 1073800000,
-                "start": 1073810000,
-                "end": 10738330000,
-                "delayTime": 10000,
-                "executionTime": 20000
-                          },
-              {
-                "taskId": 22226666,
-                "processId": 108,
-                "threadId": 108,
-                "dispatch": 1073820000,
-                "start": 1073835000,
-                "end": 1073850000,
-                "delayTime": 15000,
-                "executionTime": 15000
-                          },
-              {
-                "taskId": 33337777,
-                "processId": 108,
-                "threadId": 722,
-                "dispatch": 1073840000,
-                "start": 1073845000,
-                "end": 1073855000,
-                "delayTime": 5000,
-                "executionTime": 10000
-                          },
-              {
-                "taskId": 11115555,
-                "processId": 110,
-                "threadId": 110,
-                "dispatch": 1073845000,
-                "start": 1073850000,
-                "end": 1073860000,
-                "delayTime": 5000,
-                "executionTime": 10000
-                          },
-              {
-                "taskId": 66667777,
-                "processId": 108,
-                "threadId": 108,
-                "dispatch": 1073855000,
-                "start": 1073860000,
-                "end": 1073870000,
-                "delayTime": 5000,
-                "executionTime": 10000
-                          },
-              {
-                "taskId": 99996666,
-                "processId": 108,
-                "threadId": 108,
-                "dispatch": 1073865000,
-                "start": 1073870000,
-                "end": 1073880000,
-                "delayTime": 5000,
-                "executionTime": 10000
-                          }]
-            },
-            {
-              "sourceEventId": 0,
-              "sourceEventType": 4,
-              "tasks": []
-            }]
-          }
-          </textarea>
-          <button class="btn btn-info" id="random">Random</button>
-          <button class="btn btn-successful" id="parse">Parse</button>
-        </div>
-        <div class="col-md-9">
-          <div id="timeline"></div>
-        </div>
+    <div id="content">
+      <div class="container">
+        <h1>Isis</h1>
+        <p>B2G Task Tracer w/ Thread Scheduler Simulator</p>
+        </div></div>
       </div>
     </div>
+    <section>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3">
+            <textarea id="source" rows="20" cols="40" autofocus="" spellcheck="false">
+            </textarea>
+            <button class="btn btn-info" id="random">Random</button>
+            <button class="btn btn-primary" id="parse">Parse</button>
+          </div>
+          <div class="col-md-9">
+            <div id="timeline"></div>
+          </div>
+        </div>
+      </div>
+    </section>
   </body>
 </html>
