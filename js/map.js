@@ -97,7 +97,7 @@
       }
     },
 
-    resize: function Isis_resize(scale, offset) {
+    resize: function Isis_resize(scale) {
       var x = 0;
       var y = 0;
       if (this.currentTasks && this.currentTasks.length) {
@@ -105,27 +105,24 @@
       } else {
         this.HEIGHT = 500;
       }
-
-      if (!scale) {
-        this.WIDTH = window.innerWidth / 2;
-      } else {
-        console.log(scale);
-        this.WIDTH = scale * window.innerWidth / 2;
-      }
-      if (offset) {
-        $('#timeline').css('left', 0 - offset);
-      }
+      this.WIDTH = window.innerWidth / 2;
 
       this.map.setSize(this.WIDTH, this.HEIGHT);
+      this.timeline.setSize(this.WIDTH, this.TOP);
+      if (scale) {
+        //this.map.scaleAll(scale);
+      }
     },
 
-    clear: function Isis_clear() {
+    clear: function Isis_clear(resetColor) {
       this.map.clear();
-      this.renderTimeline();
       this.renderTooltip();
       this.count = 0;
       this.taskSets = {};
-      this._colors = {};
+      if (resetColor) {
+        this._colors = {};
+      }
+      this._threadRendered = {};
     },
 
     renderTooltip: function() {
@@ -133,7 +130,7 @@
     },
 
     parse: function Isis_parse(string) {
-      this.clear();
+      this.clear(true);
       var object = JSON.parse(string);
       this.start = object.start;
       // XXX: fix me
@@ -153,9 +150,8 @@
         var interval = end - start;
         var scale = self.interval / interval;
         var offset = (start - self.start) * scale;
-        self.resize(scale, offset);
+        self._render(start, end);
       });
-      console.log(this.interval);
       if (Array.isArray(object.tasks)) {
         this.currentTasks = object.tasks;
       } else {
@@ -167,7 +163,6 @@
 
       this.buildThreads();
       this.render();
-      setTimeout(this.buildConnections.bind(this), 1000);
 
       this.resize();
     },
@@ -179,7 +174,12 @@
     _taskMinWidth: 1,
 
     renderTimeline: function Isis_renderTimeline() {
-      this.timeline.text(this.LEFT, 15, 'Time').attr('text-anchor', 'start').attr('color', '#ffffff');
+      this.timeline.clear();
+      this.timeline.arrow(0, 0, this.WIDTH, 0, 1, 'black');
+      this.timeline.text(0, 15, 'Time').attr('text-anchor', 'start').attr('color', '#ffffff');
+      for (var i = 0; i < 10; i++) {
+        this.timeline.text(i * this.WIDTH / 10, 15, (i * this.interval / 10));
+      }
     },
 
     renderTask: function Isis_renderTask(task, sourceEventColor) {
@@ -194,9 +194,6 @@
       var ew = this.WIDTH * (task.end - task.start) / this.interval;
       var h = this._taskHeight;
       var c = sourceEventColor;
-
-      //console.log(JSON.stringify(task));
-      //console.log(lx, ex, y, lw, ew);
 
       /** Render latency **/
       var width = (lw + ew) > this._taskMinWidth ? (lw + ew) : this._taskMinWidth;
@@ -217,7 +214,7 @@
 
       if (!this._threadRendered[task.threadId]) {
         var threadRect = this.panel.rect(3, y - 10, 120, 20).attr('fill', 'white');
-        var thread = this.panel.text(5, y, 'Thread: ' + ThreadManager.getThreadName(task.threadId) || task.threadId).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15);
+        var thread = this.panel.text(5, y, 'Thread: ' + task.threadId || ThreadManager.getThreadName(task.threadId)).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15);
         this._threadRendered[task.threadId] = thread;
       }
 
@@ -236,7 +233,7 @@
       execution.hover(show, function() { this.tooltipText.remove(); }, this, this);
 
       set.push(latency, execution, label);
-      this.taskSets[task.id] = {
+      this.taskSets[task.taskId || task.id] = {
         model: task,
         view: set,
         position: {
@@ -255,37 +252,58 @@
           if (!this.currentThreads[task.threadId]) {
             this.currentThreads[task.threadId] = [];
           }
-          this.currentThreads[task.threadId].push(task);
-        }, this);
-      } else {
-        for (var taskid in this.currentTasks) {
-          var task = this.currentTasks[taskid];
-          if (!this.currentThreads[task.threadId]) {
-            this.currentThreads[task.threadId] = [];
+          if (task.sourceEventId === null) {
+            return;
           }
           this.currentThreads[task.threadId].push(task);
-        }
+        }, this);
       }
     },
 
+    _render: function Isis__render(start, end) {
+      this.clear();
+      this.interval = end - start;
+      this.start = start;
+      this.end = end;
+      this.renderTimeline();
+      var self = this;
+      for (var id in this.currentThreads) {
+        var tasks = this.currentThreads[id];
+        tasks.forEach(function(task) {
+          if (!this._colors[task.sourceEventId]) {
+            this._colors[task.sourceEventId] = get_random_color();
+          }
+
+          (function(t) {
+            setTimeout(function() {
+              self.renderTask(t, self._colors[t.sourceEventId]);
+            });
+          }(task));
+        }, this);
+      }
+      setTimeout(this.buildConnections.bind(this), 2000);
+    },
+
     render: function Isis_render() {
+      this.renderTimeline();
       this._colors = {};
       this._threadRendered = {};
       var self = this;
       for (var id in this.currentThreads) {
         var tasks = this.currentThreads[id];
         tasks.forEach(function(task) {
-          if (!this._colors[task.sourceEventType]) {
-            this._colors[task.sourceEventType] = get_random_color();
+          if (!this._colors[task.sourceEventId]) {
+            this._colors[task.sourceEventId] = get_random_color();
           }
 
           (function(t) {
             setTimeout(function() {
-              self.renderTask(t, self._colors[t.sourceEventType]);
+              self.renderTask(t, self._colors[t.sourceEventId]);
             });
           }(task));
         }, this);
       }
+      setTimeout(this.buildConnections.bind(this), 2000);
     },
 
     buildSourceEvents: function() {
@@ -295,18 +313,18 @@
 
       if (Array.isArray(this.currentTasks)) {
         this.currentTasks.forEach(function iterator(task) {
-          if (!this.currentSourceEvents[task.sourceEventType]) {
-            this.currentSourceEvents[task.sourceEventType] = [];
+          if (!this.currentSourceEvents[task.sourceEventId]) {
+            this.currentSourceEvents[task.sourceEventId] = [];
           }
-          this.currentSourceEvents[task.sourceEventType].push(task);
+          this.currentSourceEvents[task.sourceEventId].push(task);
         }, this);
       } else {
         for (var taskid in this.currentTasks) {
           var task = this.currentTasks[taskid];
-          if (!this.currentSourceEvents[task.sourceEventType]) {
-            this.currentSourceEvents[task.sourceEventType] = [];
+          if (!this.currentSourceEvents[task.sourceEventId]) {
+            this.currentSourceEvents[task.sourceEventId] = [];
           }
-          this.currentSourceEvents[task.sourceEventType].push(task);
+          this.currentSourceEvents[task.sourceEventId].push(task);
         }
       }
     },
@@ -318,10 +336,13 @@
         if (!mission)
           return;
         mission.forEach(function(task, index) {
-          var taskId = task.id;
-          var previousTaskId = task.parent;
+          var taskId = task.taskId || task.id;
+          var previousTaskId = task.parentTaskId || task.parent;
+          if (!previousTaskId)
+            return;
           var previousTaskSet = this.taskSets[previousTaskId];
           var currentTaskSet = this.taskSets[taskId];
+
           if (previousTaskSet) {
             var x1 = currentTaskSet.position.x;
             var y1 = previousTaskSet.position.y;
@@ -335,7 +356,7 @@
               y1 = y1 + this._taskHeight;
             }
 
-            this.map.arrow(x1, y1, x2, y2, 2, this._colors[task.sourceEventType]);
+            this.map.arrow(x1, y1, x2, y2, 2, this._colors[task.sourceEventId]);
           }
         }, this);
       }

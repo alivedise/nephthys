@@ -18,6 +18,7 @@
     this.tasks = [];
     this.id = this.constructor.id++;
     var count = randomCount(MISSION_COUNT);
+    var sourceEventId = null;
     for (var i = 0; i < count + 1; i++) {
       var previousTask = null;
       if (i !== 0) {
@@ -30,12 +31,16 @@
         random(MIN_EXECUTION_TIME, MAX_EXECUTION_TIME),
         this.id,
         getRandomElementFromArray(threadNames),
-        previousTask
+        previousTask,
+        sourceEventId
       );
       if (previousTask) {
         previousTask.appendSubTask(newTask);
       }
       this.tasks.push(newTask);
+      if (i === 0) {
+        sourceEventId = newTask.id || newTask.taskId;
+      }
     }
     this.start = randomCount(100000);
     this.debug('created tasks');
@@ -66,12 +71,13 @@
     }
   };
 
-  var Task = function Task(offset, executionTime, sourceEventType, threadName, previousTask) {
+  var Task = function Task(offset, executionTime, sourceEventType, threadName, previousTask, sourceEventId) {
     this.element = document.createElement('div');
     this.offset = offset;
     this.subTasks = [];
     this.executionTime = executionTime;
     this.sourceEventType = sourceEventType;
+    this.sourceEventId = sourceEventId;
     this.id = this.constructor.id++;
     this.threadId = ThreadManager.getThreadId(threadName);
     this.previousTask = previousTask;
@@ -326,7 +332,8 @@
             'dispatch': task.dispatchTime,
             'id': task.id,
             'threadId': task.threadId,
-            'sourceEventType': task.sourceEventType
+            'sourceEventType': task.sourceEventType,
+            'sourceEventId': task.sourceEventId
           };
           this._tasks.push(_task);
           break;

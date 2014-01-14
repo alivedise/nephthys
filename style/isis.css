@@ -15,11 +15,18 @@ html, body {
 #slideContainer input {
   width: 100%;
 }
+#top-left,
+#top,
+#left {
+  padding: 0;
+}
 #center {
   overflow: hidden;
+  padding: 0;
 }
 #timeline {
-
+  overflow: auto;
+  background-color: white;
 }
 #content {
   background-color: #3366CC;
