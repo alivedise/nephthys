@@ -246,7 +246,7 @@
       });
     },
 
-    _threads: [],
+    _threads: {},
 
     handleEvent: function(evt) {
       switch (evt.type) {
@@ -271,6 +271,7 @@
   };
 
   var TimeMachine = {
+    TIME: 10000000000000,
     init: function() {
       this.start = Date.now();
     },
@@ -281,7 +282,7 @@
         var mission = new Mission();
       }
 
-      clock.tick(1000000000);
+      clock.tick(this.TIME);
 
       clock.restore();
       if (typeof(done) == 'function') {

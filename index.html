@@ -3,8 +3,10 @@
   <head>
     <title>Project Isis</title>
     <link rel="stylesheet" type="text/css" href="style/isis.css">
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+    <script src="js/jquery-1.10.2.min.js"></script>
+    <script src="js/bootstrap-slider.js"></script>
+    <link rel="stylesheet" type="text/css" href="style/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/slider.css">
     <script src="js/sinon-1.7.3.js" defer></script>
     <script src="raphael/raphael.js" defer></script>
     <script src="color/color.min.js" defer></script>
@@ -20,16 +22,27 @@
       </div>
     </div>
     <section>
-      <div class="container">
+      <div class="container" id="container">
         <div class="row">
-          <div class="col-md-3">
+          <div class="col-md-3" id="menuContainer">
+            <div id="toolbar">
+              <button class="btn btn-info" id="random">Random</button>
+              <button class="btn btn-primary" id="parse" hidden>Parse</button>
+              <input class="btn btn-secondary" id="choose" type="file" />
+            </div>
             <textarea id="source" rows="20" cols="40" autofocus="" spellcheck="false">
             </textarea>
-            <button class="btn btn-info" id="random">Random</button>
-            <button class="btn btn-primary" id="parse">Parse</button>
           </div>
-          <div class="col-md-9">
-            <div id="timeline"></div>
+          <div class="col-md-9" id="mapContainer">
+            <div class="well" id="slideContainer">
+            </div>
+            <div class="container">
+              <div class="col-md-12" id="top"></div>
+              <div class="col-md-2" id="left"></div>
+              <div class="col-md-10" id="center">
+                <div id="timeline"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

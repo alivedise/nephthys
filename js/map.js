@@ -17,9 +17,9 @@
   Raphael.fn.arrow = function (x1, y1, x2, y2, size, color) {
     var angle = Math.atan2(x1-x2,y2-y1);
     angle = (angle / (2 * Math.PI)) * 360;
-    var arrowPath = this.path('M' + x2 + ' ' + y2 + ' L' + (x2 - size) + ' ' + (y2 - size) + ' L' + (x2 - size) + ' ' + (y2 + size) + ' L' + x2 + ' ' + y2 ).attr('fill', color).attr('opacity', 0.5).rotate((90+angle),x2,y2);
-    var linePath = this.path('M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2).attr('fill', color).attr('opacity', 0.5);
-    return [linePath,arrowPath];
+    var arrowPath = this.path('M' + x2 + ' ' + y2 + ' L' + (x2 - size) + ' ' + (y2 - size) + ' L' + (x2 - size) + ' ' + (y2 + size) + ' L' + x2 + ' ' + y2 ).attr('stroke', color).attr('opacity', 0.5).rotate((90+angle),x2,y2);
+    var linePath = this.path('M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2).attr('stroke', color).attr('opacity', 0.5);
+    return [linePath, arrowPath];
   }
 
   /**
@@ -47,16 +47,41 @@
     interval: 0,
     count: 0,
     parseButton: document.getElementById('parse'),
+    chooseButton: document.getElementById('choose'),
     source: document.getElementById('source'),
     tooltip: null,
+    mapContainer: document.getElementById('mapContainer'),
+    slideContainer: $('#slideContainer'),
     init: function Isis_init() {
       this.map = Raphael(document.getElementById('timeline'), this.WIDTH, this.HEIGHT);
+      this.timeline = Raphael(document.getElementById('top'), this.WIDTH, this.TOP);
+      this.panel = Raphael(document.getElementById('left'), this.LEFT, this.HEIGHT);
       source.addEventListener('change', this);
       this.random.addEventListener('click', this);
+      this.chooseButton.addEventListener('change', this);
+      window.addEventListener('resize', this.resize.bind(this));
     },
 
     handleEvent: function Isis_handleEvIsist(evt) {
       switch (evt.target) {
+        case this.chooseButton:
+          var files = evt.target.files;
+          var self = this;
+          for (var i = 0, f; f = files[i]; i++) {
+            var reader = new FileReader();
+
+            // Closure to capture the file information.
+            reader.onload = (function(theFile) {
+              return function(e) {
+                self.source.value = e.target.result;
+                self.parse(self.source.value);
+              };
+            })(f);
+
+            // Read in the image file as a data URL.
+            reader.readAsText(f);
+          }
+          break;
         case this.source:
         case this.parseButton:
           this.parse(evt.target.value);
@@ -72,12 +97,25 @@
       }
     },
 
-    resize: function Isis_resize() {
+    resize: function Isis_resize(scale, offset) {
+      var x = 0;
+      var y = 0;
       if (this.currentTasks && this.currentTasks.length) {
         this.HEIGHT = (this.currentTasks.length + 1) * (this._intervalH + this._taskHeight);
       } else {
         this.HEIGHT = 500;
       }
+
+      if (!scale) {
+        this.WIDTH = window.innerWidth / 2;
+      } else {
+        console.log(scale);
+        this.WIDTH = scale * window.innerWidth / 2;
+      }
+      if (offset) {
+        $('#timeline').css('left', 0 - offset);
+      }
+
       this.map.setSize(this.WIDTH, this.HEIGHT);
     },
 
@@ -99,15 +137,37 @@
       var object = JSON.parse(string);
       this.start = object.start;
       // XXX: fix me
-      this.end = object.end + object.end;
+      this.end = object.end;
       this.interval = this.end - this.start;
+      this.slideContainer.children().remove();
+      this.slideContainer.append('<input type="text" class="span10" value="" id="slider" style="">');
+      var self = this;
+      this.slider = $('#slider').slider({
+        min: this.start,
+        max: this.end,
+        step: 1,
+        value: [this.start, this.end]
+      }).on('slideStop', function(ev) {
+        var start = ev.value[0];
+        var end = ev.value[1];
+        var interval = end - start;
+        var scale = self.interval / interval;
+        var offset = (start - self.start) * scale;
+        self.resize(scale, offset);
+      });
+      console.log(this.interval);
       if (Array.isArray(object.tasks)) {
         this.currentTasks = object.tasks;
+      } else {
+        this.currentTasks = [];
+        for (var taskid in object.tasks) {
+          this.currentTasks.push(object.tasks[taskid]);
+        }
       }
 
       this.buildThreads();
       this.render();
-      this.buildConnections();
+      setTimeout(this.buildConnections.bind(this), 1000);
 
       this.resize();
     },
@@ -116,12 +176,17 @@
     _offsetX: 200,
     _offsetY: 20,
     _taskHeight: 10,
+    _taskMinWidth: 1,
 
     renderTimeline: function Isis_renderTimeline() {
-      this.map.text(5, 5, 'Time').attr('text-anchor', 'start').attr('color', '#ffffff');
+      this.timeline.text(this.LEFT, 15, 'Time').attr('text-anchor', 'start').attr('color', '#ffffff');
     },
 
     renderTask: function Isis_renderTask(task, sourceEventColor) {
+      // No dispatch time!
+      if (task.dispatch === 0 && task.start !== 0) {
+        task.dispatch = task.start;
+      }
       var lx = this.WIDTH * (task.dispatch - this.start) / this.interval + this._offsetX;
       var ex = this.WIDTH * (task.start - this.start) / this.interval + this._offsetX;
       var y = (this.count++) * (this._taskHeight + this._intervalH) + this._offsetY;
@@ -130,8 +195,12 @@
       var h = this._taskHeight;
       var c = sourceEventColor;
 
+      //console.log(JSON.stringify(task));
+      //console.log(lx, ex, y, lw, ew);
+
       /** Render latency **/
-      var latency = this.map.rect(lx, y, lw + ew, h);
+      var width = (lw + ew) > this._taskMinWidth ? (lw + ew) : this._taskMinWidth;
+      var latency = this.map.rect(lx, y, width, h);
       latency.attr('fill', c);
       latency.attr('opacity', 0.5);
       latency.attr('stroke', 'transparent');
@@ -142,13 +211,13 @@
       execution.attr('stroke', 'transparent');
 
       /** Render label **/
-      var label = this.map.text(lx + 5, y + this._taskHeight / 2, 'TaskID: ' + task.id).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15).attr(
+      var label = this.map.text(lx + 5, y + this._taskHeight / 2, 'TaskID: ' + (task.id || task.taskId)).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15).attr(
         'fill', sourceEventColor);
       label.attr('x', label.getBBox().x - label.getBBox().width - 10);
 
       if (!this._threadRendered[task.threadId]) {
-        var timeline = this.map.arrow(this.LEFT, y - 5, this.WIDTH, y - 5, 2, 'black');
-        var thread = this.map.text(5, y, 'Thread: ' + ThreadManager.getThreadName(task.threadId) || task.threadId).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15);
+        var threadRect = this.panel.rect(3, y - 10, 120, 20).attr('fill', 'white');
+        var thread = this.panel.text(5, y, 'Thread: ' + ThreadManager.getThreadName(task.threadId) || task.threadId).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15);
         this._threadRendered[task.threadId] = thread;
       }
 
@@ -181,17 +250,28 @@
       this.currentThreads = {};
       if (!this.currentTasks)
         return;
-      this.currentTasks.forEach(function iterator(task) {
-        if (!this.currentThreads[task.threadId]) {
-          this.currentThreads[task.threadId] = [];
+      if (Array.isArray) {
+        this.currentTasks.forEach(function iterator(task) {
+          if (!this.currentThreads[task.threadId]) {
+            this.currentThreads[task.threadId] = [];
+          }
+          this.currentThreads[task.threadId].push(task);
+        }, this);
+      } else {
+        for (var taskid in this.currentTasks) {
+          var task = this.currentTasks[taskid];
+          if (!this.currentThreads[task.threadId]) {
+            this.currentThreads[task.threadId] = [];
+          }
+          this.currentThreads[task.threadId].push(task);
         }
-        this.currentThreads[task.threadId].push(task);
-      }, this);
+      }
     },
 
-    render: function() {
+    render: function Isis_render() {
       this._colors = {};
       this._threadRendered = {};
+      var self = this;
       for (var id in this.currentThreads) {
         var tasks = this.currentThreads[id];
         tasks.forEach(function(task) {
@@ -199,7 +279,11 @@
             this._colors[task.sourceEventType] = get_random_color();
           }
 
-          this.renderTask(task, this._colors[task.sourceEventType]);
+          (function(t) {
+            setTimeout(function() {
+              self.renderTask(t, self._colors[t.sourceEventType]);
+            });
+          }(task));
         }, this);
       }
     },
@@ -208,12 +292,23 @@
       this.currentSourceEvents = {};
       if (!this.currentTasks)
         return;
-      this.currentTasks.forEach(function iterator(task) {
-        if (!this.currentSourceEvents[task.sourceEventType]) {
-          this.currentSourceEvents[task.sourceEventType] = [];
+
+      if (Array.isArray(this.currentTasks)) {
+        this.currentTasks.forEach(function iterator(task) {
+          if (!this.currentSourceEvents[task.sourceEventType]) {
+            this.currentSourceEvents[task.sourceEventType] = [];
+          }
+          this.currentSourceEvents[task.sourceEventType].push(task);
+        }, this);
+      } else {
+        for (var taskid in this.currentTasks) {
+          var task = this.currentTasks[taskid];
+          if (!this.currentSourceEvents[task.sourceEventType]) {
+            this.currentSourceEvents[task.sourceEventType] = [];
+          }
+          this.currentSourceEvents[task.sourceEventType].push(task);
         }
-        this.currentSourceEvents[task.sourceEventType].push(task);
-      }, this);
+      }
     },
 
     buildConnections: function Isis_buildConnections(sourceEvents) {
