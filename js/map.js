@@ -1,3 +1,4 @@
+/* -*- Mode: Javascript; tab-width: 2; indent-tabs-mode: nil; js-indent-level: 2; -*- */
 (function(window) {
   var _start = Date.now();
 
@@ -101,7 +102,7 @@
       var x = 0;
       var y = 0;
       if (this.currentTasks && this.currentTasks.length) {
-        this.HEIGHT = (this.currentTasks.length + 1) * (this._intervalH + this._taskHeight);
+        this.HEIGHT = (this._num_task_rows + 1) * (this._intervalH + this._taskHeight);
       } else {
         this.HEIGHT = 500;
       }
@@ -162,6 +163,7 @@
       }
 
       this.buildThreads();
+      this.placeTasks();
       this.render();
 
       this.resize();
@@ -189,7 +191,7 @@
       }
       var lx = this.WIDTH * (task.dispatch - this.start) / this.interval + this._offsetX;
       var ex = this.WIDTH * (task.start - this.start) / this.interval + this._offsetX;
-      var y = (this.count++) * (this._taskHeight + this._intervalH) + this._offsetY;
+      var y = task.place_y * (this._taskHeight + this._intervalH) + this._offsetY;
       var lw = this.WIDTH * (task.start - task.dispatch) / this.interval;
       var ew = this.WIDTH * (task.end - task.start) / this.interval;
       var h = this._taskHeight;
@@ -258,6 +260,37 @@
           this.currentThreads[task.threadId].push(task);
         }, this);
       }
+    },
+
+    placeTasks: function() {
+      function _pickbag(bags) {
+	      var min = 0;
+	      for (var i = 0; i < bags.length; i++) {
+	        if (bags[min] > bags[i]) {
+		        min = i;
+	        }
+	      }
+	      return min;
+      }
+
+	    var thread_first_y = 0;
+
+	    for (var id in this.currentThreads) {
+	      var tasks = this.currentThreads[id];
+	      var bags = [0];
+        tasks.sort(function(t1, t2) { return t1.dispatch - t2.dispatch; });
+	      tasks.forEach(function(task) {
+		      var bag_i = _pickbag(bags);
+		      if (bags[bag_i] > task.dispatch) {
+		        bag_i = bags.length;
+            bags.push(0);
+		      }
+		      task.place_y = bag_i + thread_first_y;
+		      bags[bag_i] = task.end;
+	      });
+	      thread_first_y = thread_first_y + bags.length;
+	    }
+      this._num_task_rows = thread_first_y;
     },
 
     _render: function Isis__render(start, end) {
