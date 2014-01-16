@@ -210,9 +210,13 @@
       execution.attr('stroke', 'transparent');
 
       /** Render label **/
-      var label = this.map.text(lx + 5, y + this._taskHeight / 2, 'TaskID: ' + (task.id || task.taskId)).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15).attr(
-        'fill', sourceEventColor);
-      label.attr('x', label.getBBox().x - label.getBBox().width - 10);
+      var label;
+
+      if (task.parentTaskId === task.sourceEventId) {
+        label = this.map.text(lx + 5, y + this._taskHeight / 2, (task.sourceEventId)).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15).attr(
+          'fill', sourceEventColor);
+        label.attr('x', label.getBBox().x - label.getBBox().width - 10);
+      }
 
       if (!this._threadRendered[task.threadId]) {
         var threadRect = this.panel.rect(3, y - 10, 120, 20).attr('fill', 'white');
