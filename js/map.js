@@ -53,6 +53,8 @@
     tooltip: null,
     mapContainer: document.getElementById('mapContainer'),
     slideContainer: $('#slideContainer'),
+    typeSelector: $('#bySourceEventType'),
+    idSelector: $('#bySourceEventId'),
     init: function Isis_init() {
       this.map = Raphael(document.getElementById('timeline'), this.WIDTH, this.HEIGHT);
       this.timeline = Raphael(document.getElementById('top'), this.WIDTH, this.TOP);
@@ -61,6 +63,28 @@
       this.random.addEventListener('click', this);
       this.chooseButton.addEventListener('change', this);
       window.addEventListener('resize', this.resize.bind(this));
+      this.typeSelector.change(this.renderIdSelector.bind(this));
+      this.idSelector.change(this.renderBySourceEventId.bind(this));
+      $('.selectpicker').selectpicker();
+    },
+
+    renderBySourceEventId: function Isis_renderByTaskId(evt) {
+      this.currentFilter = {
+        'sourceEventId': $(evt.target).val()
+      };
+      console.log(this.currentFilter);
+      this._render();
+      this.currentFilter = null;
+    },
+
+    renderIdSelector: function Isis_renderIdSelector(evt) {
+      this.idSelector.html('');
+      $(evt.target).val().forEach(function iterator(type) {
+        this.currentSourceEventTypes[type].forEach(function iterator2(id) {
+          this.idSelector.append('<option value="' + id + '">' + id + '</option>')
+        }, this);
+      }, this);
+      $('.selectpicker').selectpicker('refresh');
     },
 
     handleEvent: function Isis_handleEvIsist(evt) {
@@ -209,6 +233,8 @@
       execution.attr('fill', c);
       execution.attr('stroke', 'transparent');
 
+      console.log('rendering ' + task.sourceEventId);
+
       /** Render label **/
       var label;
 
@@ -311,14 +337,29 @@
             this._colors[task.sourceEventId] = get_random_color();
           }
 
-          (function(t) {
-            setTimeout(function() {
-              self.renderTask(t, self._colors[t.sourceEventId]);
-            });
-          }(task));
+          console.log(this.currentFilter.sourceEventId);
+          console.log(task.sourceEventId);
+          console.log(this.currentFilter.sourceEventId.indexOf(task.sourceEventId.toString()));
+
+          if (!this.currentFilter ||
+              (this.currentFilter.sourceEventId.indexOf(task.sourceEventId.toString()) >= 0)) {
+            (function(t) {
+              setTimeout(function() {
+                self.renderTask(t, self._colors[t.sourceEventId]);
+              });
+            }(task));
+          }
         }, this);
       }
       setTimeout(this.buildConnections.bind(this), 2000);
+    },
+
+    renderTypeSelector: function Isis_renderTypeSelector() {
+      this.typeSelector.html('');
+      for (var type in this.currentSourceEventTypes) {
+        this.typeSelector.append('<option value="' + type + '">' + type + '</option>');
+      }
+      $('.selectpicker').selectpicker('refresh');
     },
 
     render: function Isis_render() {
@@ -345,6 +386,7 @@
 
     buildSourceEvents: function() {
       this.currentSourceEvents = {};
+      this.currentSourceEventTypes = {};
       if (!this.currentTasks)
         return;
 
@@ -353,17 +395,16 @@
           if (!this.currentSourceEvents[task.sourceEventId]) {
             this.currentSourceEvents[task.sourceEventId] = [];
           }
-          this.currentSourceEvents[task.sourceEventId].push(task);
-        }, this);
-      } else {
-        for (var taskid in this.currentTasks) {
-          var task = this.currentTasks[taskid];
-          if (!this.currentSourceEvents[task.sourceEventId]) {
-            this.currentSourceEvents[task.sourceEventId] = [];
+          if (!this.currentSourceEventTypes[task.sourceEventType]) {
+            this.currentSourceEventTypes[task.sourceEventType] = [];
           }
-          this.currentSourceEvents[task.sourceEventId].push(task);
-        }
+          if (this.currentSourceEventTypes[task.sourceEventType].indexOf(task.sourceEventId) < 0) {
+            this.currentSourceEventTypes[task.sourceEventType].push(task.sourceEventId);
+          }
+        }, this);
       }
+
+      this.renderTypeSelector();
     },
 
     buildConnections: function Isis_buildConnections(sourceEvents) {
