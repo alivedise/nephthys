@@ -2,20 +2,11 @@
 <html>
   <head>
     <title>Project Isis</title>
+    <script data-main="js/main" src="lib/alameda.js" defer></script>
     <link rel="stylesheet" type="text/css" href="style/isis.css">
-    <script src="lib/jquery-1.10.2.min.js"></script>
-    <script src="js/bootstrap-slider.js"></script>
-    <script src="lib/bootstrap-select/bootstrap-select.min.js"></script>
     <link rel="stylesheet" type="text/css" href="lib/bootstrap-select/bootstrap-select.min.css">
     <link rel="stylesheet" type="text/css" href="style/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/slider.css">
-    <script src="js/sinon-1.7.3.js" defer></script>
-    <script src="raphael/raphael.js" defer></script>
-    <script src="color/color.min.js" defer></script>
-    <script src="js/thread.js" defer></script>
-    <script src="lib/jquery.layout-latest.js" defer></script>
-    <script src="js/map.js" defer></script>
-    <!--script src="js/app.js" defer></script-->
   </head>
   <body>
     <div id="content">
@@ -25,85 +16,81 @@
         </div></div>
       </div>
     </div>
-    <section>
-      <div class="container" id="container">
-        <div class="row">
-          <div class="col-md-3" id="menuContainer">
-            <div id="toolbar">
-              <button class="btn btn-info" id="random">Random</button>
-              <button class="btn btn-primary" id="parse" hidden>Parse</button>
-              <input class="btn btn-secondary" id="choose" type="file" />
-            </div>
-            <textarea id="source" rows="20" cols="30" autofocus="" spellcheck="false">
-            </textarea>
-            <div>
-              <form class="form-horizontal">
-              <fieldset>
+    <div class="container" id="container">
+      <div id="menuContainer">
+        <div id="toolbar">
+          <button class="btn btn-info" id="random">Random</button>
+          <button class="btn btn-primary" id="parse" hidden>Parse</button>
+          <input class="btn btn-secondary" id="choose" type="file" />
+        </div>
+        <textarea id="source" rows="20" cols="30" autofocus="" spellcheck="false">
+        </textarea>
+        <div>
+          <form class="form-horizontal">
+          <fieldset>
 
-              <!-- Form Name -->
-              <legend>Filters</legend>
+          <!-- Form Name -->
+          <legend>Filters</legend>
 
-              <!-- Text input-->
-              <div class="control-group">
-                <label class="control-label" for="filter">Filter text</label>
-                <div class="controls">
-                  <input id="filter" name="filter" type="text" placeholder="placeholder" class="input-xlarge">
-                  
-                </div>
-              </div>
-
-              <!-- Multiple Radios -->
-              <div class="control-group">
-                <label class="control-label" for="tag">Contains tasks</label>
-                <div class="controls">
-                  <label class="radio" for="tag-0">
-                    <input type="radio" name="tag" id="tag-0" value="User Label" checked="checked">
-                    User Label
-                  </label>
-                  <label class="radio" for="tag-1">
-                    <input type="radio" name="tag" id="tag-1" value="No label">
-                    No label
-                  </label>
-                </div>
-              </div>
-
-              <!-- Select Multiple -->
-              <div class="control-group">
-                <label class="control-label" for="bySourceEventType">By source event type</label>
-                <div class="controls">
-                  <select id="bySourceEventType" name="bySourceEventType" class="input-xlarge" multiple="multiple" class="selectpicker">
-                  </select>
-                </div>
-              </div>
-
-              <!-- Select Multiple -->
-              <div class="control-group">
-                <label class="control-label" for="bySourceEventId">By source event ID</label>
-                <div class="controls">
-                  <select id="bySourceEventId" name="bySourceEventId" class="input-xlarge" multiple="multiple" class="selectpicker">
-                  </select>
-                </div>
-              </div>
-
-              </fieldset>
-              </form>
-
+          <!-- Text input-->
+          <div class="control-group">
+            <label class="control-label" for="filter">Filter text</label>
+            <div class="controls">
+              <input id="filter" name="filter" type="text" placeholder="placeholder" class="input-xlarge">
+              
             </div>
           </div>
-          <div class="col-md-9" id="mapContainer">
-            <div class="well" id="slideContainer">
+
+          <!-- Multiple Radios -->
+          <div class="control-group">
+            <label class="control-label" for="tag">Contains tasks</label>
+            <div class="controls">
+              <label class="radio" for="tag-0">
+                <input type="radio" name="tag" id="tag-0" value="User Label" checked="checked">
+                User Label
+              </label>
+              <label class="radio" for="tag-1">
+                <input type="radio" name="tag" id="tag-1" value="No label">
+                No label
+              </label>
             </div>
-            <div class="container">
-              <div class="col-md-2" id="top-left"></div>
-              <div class="col-md-10" id="top"></div>
-              <div class="col-md-2" id="left"></div>
-              <div class="col-md-10" id="center">
-                <div id="timeline"></div>
-              </div>
+          </div>
+
+          <!-- Select Multiple -->
+          <div class="control-group">
+            <label class="control-label" for="bySourceEventType">By source event type</label>
+            <div class="controls">
+              <select id="bySourceEventType" name="bySourceEventType" class="input-xlarge" multiple="multiple" class="selectpicker">
+              </select>
             </div>
+          </div>
+
+          <!-- Select Multiple -->
+          <div class="control-group">
+            <label class="control-label" for="bySourceEventId">By source event ID</label>
+            <div class="controls">
+              <select id="bySourceEventId" name="bySourceEventId" class="input-xlarge" multiple="multiple" class="selectpicker">
+              </select>
+            </div>
+          </div>
+
+          </fieldset>
+          </form>
+
+        </div>
+      </div>
+      <div class="col-md-9" id="mapContainer">
+        <div class="well" id="slideContainer">
+        </div>
+        <div class="container">
+          <div class="col-md-2" id="top-left"></div>
+          <div class="col-md-10" id="top"></div>
+          <div class="col-md-2" id="left"></div>
+          <div class="col-md-10" id="center">
+            <div id="timeline"></div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   </body>
 </html>

@@ -1,4 +1,4 @@
-(function(window) {
+require(['../lib/sinon-1.7.3'], function() {
   var MIN_EXECUTION_TIME = 900000;
   var MAX_EXECUTION_TIME = 100000000;
   var TIME_FACTOR = 1;
@@ -373,4 +373,4 @@
   window.Task = Task;
   window.Thread = Thread;
   window.TimeMachine = TimeMachine;
-}(this));
+});
