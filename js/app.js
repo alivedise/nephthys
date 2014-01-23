@@ -10,9 +10,7 @@
   App.prototype = {
     init: function() {
       this.layoutController = new LayoutController();
-      $(function() {
-        
-      });
+      this.filter = new Filter();
     }
   };
 

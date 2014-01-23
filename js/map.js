@@ -132,7 +132,7 @@
     },
 
     renderTooltip: function() {
-      // this.tooltip = this.map.rect(this.WIDTH - 200, 15, 200, 50);
+      //this.tooltip = this.map.rect(this.WIDTH - 200, 15, 200, 50);
     },
 
     parse: function Isis_parse(string) {
@@ -207,12 +207,12 @@
       var latency = this.map.rect(lx, y, width, h);
       latency.attr('fill', c);
       latency.attr('opacity', 0.5);
-      latency.attr('stroke', 'transparent');
+      latency.attr('stroke', 'black');
 
       /** Render execution **/
       var execution = this.map.rect(ex, y, ew, h);
       execution.attr('fill', c);
-      execution.attr('stroke', 'transparent');
+      execution.attr('stroke', 'black');
 
       /** Render label **/
       var label;
