@@ -55,34 +55,42 @@
     slideContainer: $('#slideContainer'),
     init: function Isis_init() {
       this.map = Raphael(document.getElementById('timeline'), this.WIDTH, this.HEIGHT);
-      this.timeline = Raphael(document.getElementById('top'), this.WIDTH, this.TOP);
-      this.panel = Raphael(document.getElementById('left'), this.LEFT, this.HEIGHT);
+      this.timeline = Raphael(document.getElementById('timeContainer'), this.WIDTH, this.TOP);
+      this.panel = Raphael(document.getElementById('threadContainer'), this.LEFT, this.HEIGHT);
       source.addEventListener('change', this);
       this.random.addEventListener('click', this);
-      this.chooseButton.addEventListener('change', this);
+      var self = this;
+      $(function() {
+        $('input[type=file]').bootstrapFileInput();
+        $('#choose').change(function(evt) {
+          self.read(evt);
+        });
+      });
       window.addEventListener('resize', this.resize.bind(this));
     },
 
+    read: function(evt) {
+      var files = evt.target.files;
+      var self = this;
+      for (var i = 0, f; f = files[i]; i++) {
+        var reader = new FileReader();
+
+        // Closure to capture the file information.
+        reader.onload = (function(theFile) {
+          return function(e) {
+            self.source.value = e.target.result;
+            self.parse(self.source.value);
+          };
+        })(f);
+
+        // Read in the image file as a data URL.
+        reader.readAsText(f);
+      }
+    },
+
     handleEvent: function Isis_handleEvIsist(evt) {
+      console.log('handling ' + evt.type + ' on ' + evt.target);
       switch (evt.target) {
-        case this.chooseButton:
-          var files = evt.target.files;
-          var self = this;
-          for (var i = 0, f; f = files[i]; i++) {
-            var reader = new FileReader();
-
-            // Closure to capture the file information.
-            reader.onload = (function(theFile) {
-              return function(e) {
-                self.source.value = e.target.result;
-                self.parse(self.source.value);
-              };
-            })(f);
-
-            // Read in the image file as a data URL.
-            reader.readAsText(f);
-          }
-          break;
         case this.source:
         case this.parseButton:
           this.parse(evt.target.value);
@@ -106,13 +114,10 @@
       } else {
         this.HEIGHT = 500;
       }
-      this.WIDTH = window.innerWidth / 2;
+      this.WIDTH = $('#timeline').width();
 
       this.map.setSize(this.WIDTH, this.HEIGHT);
       this.timeline.setSize(this.WIDTH, this.TOP);
-      if (scale) {
-        //this.map.scaleAll(scale);
-      }
     },
 
     clear: function Isis_clear(resetColor) {
@@ -219,8 +224,8 @@
       }
 
       if (!this._threadRendered[task.threadId]) {
-        var threadRect = this.panel.rect(3, y - 10, 120, 20).attr('fill', 'white');
-        var thread = this.panel.text(5, y, 'Thread: ' + task.threadId || ThreadManager.getThreadName(task.threadId)).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15);
+        var threadRect = this.map.rect(3, y - 10, 120, 20).attr('fill', 'white');
+        var thread = this.map.text(5, y, 'Thread: ' + task.threadId || ThreadManager.getThreadName(task.threadId)).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15);
         this._threadRendered[task.threadId] = thread;
       }
 
