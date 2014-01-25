@@ -16,6 +16,11 @@ textarea {
   overflow-y: auto;
 }
 
+.ui-layout-pane-west {
+  padding: 5px;
+  background-color: #eee;
+}
+
 /* Style for Bootstrap */
 .navbar-nav .btn {
   height: 47px;

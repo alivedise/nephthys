@@ -6,9 +6,14 @@
   };
 
   LayoutController.prototype = {
+    publish: function(event, detail) {
+      console.log('publishing ' + event);
+      window.dispatchEvent(new CustomEvent(event, { detail: detail }));
+    },
     init: function() {
+      var self = this;
       this._layout = $('body').layout({
-          center__paneSelector: ".layout-center"
+        center__paneSelector: ".layout-center"
         , west__paneSelector:   ".layout-west"
         , north__paneSelector:   ".layout-north"
         , west__size:       250
@@ -18,6 +23,9 @@
           // MIDDLE-LAYOUT (child of outer-center-pane)
         , center__childOptions: {
             center__paneSelector: "#timeline"
+          , center__onresize: function() {
+              self.publish('ui-resize');
+            }
           , north__paneSelector:   "#ui-top"
           , north__size:      50
           , spacing_open:     0  // ALL panes

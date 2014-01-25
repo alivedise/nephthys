@@ -66,7 +66,11 @@
           self.read(evt);
         });
       });
-      window.addEventListener('resize', this.resize.bind(this));
+      window.addEventListener('ui-resize', this.resize.bind(this));
+    },
+
+    publish: function(event, detail) {
+      window.dispatchEvent(new CustomEvent(event, { detail: detail }));
     },
 
     read: function(evt) {
@@ -106,9 +110,11 @@
       }
     },
 
-    resize: function Isis_resize(scale) {
-      var x = 0;
-      var y = 0;
+    resize: function Isis_resize(event) {
+      if (event.type && event.type === 'ui-resize' &&
+          this.WIDTH === $('#timeline').width()) {
+        return;
+      }
       if (this.currentTasks && this.currentTasks.length) {
         this.HEIGHT = (this._num_task_rows + 1) * (this._intervalH + this._taskHeight);
       } else {
@@ -118,10 +124,14 @@
 
       this.map.setSize(this.WIDTH, this.HEIGHT);
       this.timeline.setSize(this.WIDTH, this.TOP);
+      this.map.clear();
+      this.map.rect(0, 0, this.WIDTH, this.HEIGHT);
+      this.render();
     },
 
     clear: function Isis_clear(resetColor) {
       this.map.clear();
+      this.map.rect(0, 0, this.WIDTH, this.HEIGHT);
       this.renderTooltip();
       this.count = 0;
       this.taskSets = {};
@@ -132,7 +142,7 @@
     },
 
     renderTooltip: function() {
-      //this.tooltip = this.map.rect(this.WIDTH - 200, 15, 200, 50);
+      this.tooltip = this.map.rect(this.WIDTH - 200, 15, 200, 50);
     },
 
     parse: function Isis_parse(string) {
@@ -169,7 +179,6 @@
 
       this.buildThreads();
       this.placeTasks();
-      this.render();
 
       this.resize();
     },
@@ -350,6 +359,7 @@
 
     buildSourceEvents: function() {
       this.currentSourceEvents = {};
+      this.currentSourceEventTypes = {};
       if (!this.currentTasks)
         return;
 
@@ -359,16 +369,15 @@
             this.currentSourceEvents[task.sourceEventId] = [];
           }
           this.currentSourceEvents[task.sourceEventId].push(task);
-        }, this);
-      } else {
-        for (var taskid in this.currentTasks) {
-          var task = this.currentTasks[taskid];
-          if (!this.currentSourceEvents[task.sourceEventId]) {
-            this.currentSourceEvents[task.sourceEventId] = [];
+
+          if (!this.currentSourceEventTypes[task.sourceEventType]) {
+            this.currentSourceEventTypes[task.sourceEventType] = [];
           }
-          this.currentSourceEvents[task.sourceEventId].push(task);
-        }
+          this.currentSourceEventTypes[task.sourceEventType].push(task.sourceEventId);
+        }, this);
       }
+
+      this.publish('source-event-type-updated', this.currentSourceEventTypes);
     },
 
     buildConnections: function Isis_buildConnections(sourceEvents) {

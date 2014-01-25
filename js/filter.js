@@ -6,8 +6,6 @@
     this.init();
   };
 
-  Filter.prototype = Object.create(EventEmitter.prototype);
-
   var proto = Filter.prototype;
 
   proto.typeSelector = $('#bySourceEventType');
@@ -16,24 +14,25 @@
   proto.init = function() {
     this.typeSelector.change(this.renderIdSelector.bind(this));
     this.idSelector.change(this.renderBySourceEventId.bind(this));
-    $('.selectpicker').selectpicker();
-    window.addEventListener('profile-imported', this);
+    $('select').selectpicker();
+    window.addEventListener('source-event-type-updated', this);
   };
 
   proto.handleEvent = function(evt) {
     switch (evt.type) {
-      case 'profile-imported':
-        this.render
+      case 'source-event-type-updated':
+        this.renderTypeSelector(evt.detail);
         break;
     }
   };
 
-  proto.renderTypeSelector = function renderTypeSelector() {
+  proto.renderTypeSelector = function renderTypeSelector(sourceEventTypes) {
+    this.currentSourceEventTypes = sourceEventTypes;
     this.typeSelector.html('');
-    for (var type in this.currentSourceEventTypes) {
+    for (var type in sourceEventTypes) {
       this.typeSelector.append('<option value="' + type + '">' + type + '</option>');
     }
-    $('.selectpicker').selectpicker('refresh');
+    $('select').selectpicker('refresh');
   };
 
   proto.renderBySourceEventId = function renderByTaskId(evt) {
@@ -50,7 +49,11 @@
         this.idSelector.append('<option value="' + id + '">' + id + '</option>')
       }, this);
     }, this);
-    $('.selectpicker').selectpicker('refresh');
+    $('select').selectpicker('refresh');
+  };
+
+  proto.publish = function(event, detail) {
+    window.dispatchEvent(new CustomEvent(event, { detail: detail }));
   };
 
   exports.Filter = Filter;
