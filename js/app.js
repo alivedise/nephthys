@@ -1,8 +1,6 @@
 'use strict';
 
 (function(exports) {
-  var LayoutController = exports.LayoutController;
-
   var App = function() {
     this.init();
   };
@@ -11,6 +9,7 @@
     init: function() {
       this.layoutController = new LayoutController();
       this.filter = new Filter();
+      this.colorManager = new ColorManager();
     }
   };
 

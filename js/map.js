@@ -23,19 +23,6 @@
     return [linePath, arrowPath];
   }
 
-  /**
-   * Generate random color hash
-   * @return {String}     Color hash
-   */
-  function get_random_color() {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[ Math.round(Math.random() * 15) ];
-    }
-    return color;
-  }
-
   var Isis = {
     random: document.getElementById('random'),
     TIME_FACTOR: 0.5,
@@ -54,9 +41,7 @@
     mapContainer: document.getElementById('mapContainer'),
     slideContainer: $('#slideContainer'),
     init: function Isis_init() {
-      this.map = Raphael(document.getElementById('timeline'), this.WIDTH, this.HEIGHT);
       this.timeline = Raphael(document.getElementById('timeContainer'), this.WIDTH, this.TOP);
-      this.panel = Raphael(document.getElementById('threadContainer'), this.LEFT, this.HEIGHT);
       source.addEventListener('change', this);
       this.random.addEventListener('click', this);
       var self = this;
@@ -111,7 +96,7 @@
     },
 
     resize: function Isis_resize(event) {
-      if (event.type && event.type === 'ui-resize' &&
+      if (event && event.type && event.type === 'ui-resize' &&
           this.WIDTH === $('#timeline').width()) {
         return;
       }
@@ -122,16 +107,11 @@
       }
       this.WIDTH = $('#timeline').width();
 
-      this.map.setSize(this.WIDTH, this.HEIGHT);
       this.timeline.setSize(this.WIDTH, this.TOP);
-      this.map.clear();
-      this.map.rect(0, 0, this.WIDTH, this.HEIGHT);
       this.render();
     },
 
     clear: function Isis_clear(resetColor) {
-      this.map.clear();
-      this.map.rect(0, 0, this.WIDTH, this.HEIGHT);
       this.renderTooltip();
       this.count = 0;
       this.taskSets = {};
@@ -142,7 +122,6 @@
     },
 
     renderTooltip: function() {
-      this.tooltip = this.map.rect(this.WIDTH - 200, 15, 200, 50);
     },
 
     parse: function Isis_parse(string) {
@@ -196,71 +175,6 @@
       for (var i = 0; i < 10; i++) {
         this.timeline.text(i * this.WIDTH / 10, 15, (i * this.interval / 10));
       }
-    },
-
-    renderTask: function Isis_renderTask(task, sourceEventColor) {
-      // No dispatch time!
-      if (task.dispatch === 0 && task.start !== 0) {
-        task.dispatch = task.start;
-      }
-      var lx = this.WIDTH * (task.dispatch - this.start) / this.interval + this._offsetX;
-      var ex = this.WIDTH * (task.start - this.start) / this.interval + this._offsetX;
-      var y = task.place_y * (this._taskHeight + this._intervalH) + this._offsetY;
-      var lw = this.WIDTH * (task.start - task.dispatch) / this.interval;
-      var ew = this.WIDTH * (task.end - task.start) / this.interval;
-      var h = this._taskHeight;
-      var c = sourceEventColor;
-
-      /** Render latency **/
-      var width = (lw + ew) > this._taskMinWidth ? (lw + ew) : this._taskMinWidth;
-      var latency = this.map.rect(lx, y, width, h);
-      latency.attr('fill', c);
-      latency.attr('opacity', 0.5);
-      latency.attr('stroke', 'black');
-
-      /** Render execution **/
-      var execution = this.map.rect(ex, y, ew, h);
-      execution.attr('fill', c);
-      execution.attr('stroke', 'black');
-
-      /** Render label **/
-      var label;
-
-      if (task.parentTaskId === task.sourceEventId) {
-        label = this.map.text(lx + 5, y + this._taskHeight / 2, (task.sourceEventId)).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15).attr(
-          'fill', sourceEventColor);
-        label.attr('x', label.getBBox().x - label.getBBox().width - 10);
-      }
-
-      if (!this._threadRendered[task.threadId]) {
-        var threadRect = this.map.rect(3, y - 10, 120, 20).attr('fill', 'white');
-        var thread = this.map.text(5, y, 'Thread: ' + task.threadId || ThreadManager.getThreadName(task.threadId)).attr('text-anchor', 'start').attr('color', '#ffffff').attr('font-size', 15);
-        this._threadRendered[task.threadId] = thread;
-      }
-
-
-      var set = this.map.set();
-      var show = function(){
-        if (this.tooltipText) {
-          this.tooltipText.remove();
-        }
-        this.tooltipText = this.map.text(this.WIDTH - 190, 40,
-          'Dispatch: ' + task.dispatch + ' ' + 'Latency: ' + (task.start - task.dispatch) + '\n' +
-          'Start: ' + task.start + ' ' + 'Execution: ' + (task.end - task.start) + '\n' +
-          'End: ' + task.end).attr('text-anchor', 'start');
-      }
-      latency.hover(show, function() { this.tooltipText.remove(); }, this, this);
-      execution.hover(show, function() { this.tooltipText.remove(); }, this, this);
-
-      set.push(latency, execution, label);
-      this.taskSets[task.taskId || task.id] = {
-        model: task,
-        view: set,
-        position: {
-          x: lx,
-          y: y
-        }
-      };
     },
 
     buildThreads: function() {
@@ -318,21 +232,7 @@
       this.end = end;
       this.renderTimeline();
       var self = this;
-      for (var id in this.currentThreads) {
-        var tasks = this.currentThreads[id];
-        tasks.forEach(function(task) {
-          if (!this._colors[task.sourceEventId]) {
-            this._colors[task.sourceEventId] = get_random_color();
-          }
-
-          (function(t) {
-            setTimeout(function() {
-              self.renderTask(t, self._colors[t.sourceEventId]);
-            });
-          }(task));
-        }, this);
-      }
-      setTimeout(this.buildConnections.bind(this), 2000);
+      //setTimeout(this.buildConnections.bind(this), 2000);
     },
 
     render: function Isis_render() {
@@ -341,20 +241,15 @@
       this._threadRendered = {};
       var self = this;
       for (var id in this.currentThreads) {
-        var tasks = this.currentThreads[id];
-        tasks.forEach(function(task) {
-          if (!this._colors[task.sourceEventId]) {
-            this._colors[task.sourceEventId] = get_random_color();
-          }
-
-          (function(t) {
-            setTimeout(function() {
-              self.renderTask(t, self._colors[t.sourceEventId]);
-            });
-          }(task));
-        }, this);
+        var thread = new Thread({
+          id: id,
+          tasks: this.currentThreads[id],
+          name: '',
+          start: this.start,
+          end: this.end,
+          interval: this.interval
+        });
       }
-      setTimeout(this.buildConnections.bind(this), 2000);
     },
 
     buildSourceEvents: function() {
@@ -407,7 +302,7 @@
               y1 = y1 + this._taskHeight;
             }
 
-            this.map.arrow(x1, y1, x2, y2, 2, this._colors[task.sourceEventId]);
+            //this.map.arrow(x1, y1, x2, y2, 2, this._colors[task.sourceEventId]);
           }
         }, this);
       }
