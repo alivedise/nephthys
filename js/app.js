@@ -10,6 +10,7 @@
       this.layoutController = new LayoutController();
       this.filter = new Filter();
       this.colorManager = new ColorManager();
+      this.broadcaster = new EventEmitter();
     }
   };
 

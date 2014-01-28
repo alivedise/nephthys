@@ -100,11 +100,6 @@
           this.WIDTH === $('#timeline').width()) {
         return;
       }
-      if (this.currentTasks && this.currentTasks.length) {
-        this.HEIGHT = (this._num_task_rows + 1) * (this._intervalH + this._taskHeight);
-      } else {
-        this.HEIGHT = 500;
-      }
       this.WIDTH = $('#timeline').width();
 
       this.timeline.setSize(this.WIDTH, this.TOP);
@@ -157,7 +152,6 @@
       }
 
       this.buildThreads();
-      this.placeTasks();
 
       this.resize();
     },
@@ -192,37 +186,6 @@
           this.currentThreads[task.threadId].push(task);
         }, this);
       }
-    },
-
-    placeTasks: function() {
-      function _pickbag(bags) {
-	      var min = 0;
-	      for (var i = 0; i < bags.length; i++) {
-	        if (bags[min] > bags[i]) {
-		        min = i;
-	        }
-	      }
-	      return min;
-      }
-
-	    var thread_first_y = 0;
-
-	    for (var id in this.currentThreads) {
-	      var tasks = this.currentThreads[id];
-	      var bags = [0];
-        tasks.sort(function(t1, t2) { return t1.dispatch - t2.dispatch; });
-	      tasks.forEach(function(task) {
-		      var bag_i = _pickbag(bags);
-		      if (bags[bag_i] > task.dispatch) {
-		        bag_i = bags.length;
-            bags.push(0);
-		      }
-		      task.place_y = bag_i + thread_first_y;
-		      bags[bag_i] = task.end;
-	      });
-	      thread_first_y = thread_first_y + bags.length;
-	    }
-      this._num_task_rows = thread_first_y;
     },
 
     _render: function Isis__render(start, end) {
