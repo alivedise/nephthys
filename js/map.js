@@ -112,6 +112,7 @@
     },
 
     parse: function Isis_parse(string) {
+      window.broadcaster && window.broadcaster.emit('profile-imported');
       this.clear(true);
       var object = JSON.parse(string);
       this.start = object.start;

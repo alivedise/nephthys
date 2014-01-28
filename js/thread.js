@@ -95,6 +95,7 @@
     var self = this;
     var tasks = this.config.tasks;
     var ColorManager = window.app.colorManager;
+    this._tooltip = this._canvas.rect(0, 0, 150, 30).attr('stroke', 'transparent').attr('fill', 'yellow').hide();
     this.config.tasks.forEach(function(task) {
       (function(t) {
         setTimeout(function() {
@@ -108,7 +109,10 @@
       var y = evt.pageY;
       var ele = this._canvas.getElementByPoint(x, y);
       if (ele) {
-        console.log(ele);
+        // console.log(ele);
+        // this._tooltip.attr('x', evt.offsetX).attr('y', evt.offsetY).show();
+      } else {
+        this._tooltip.hide();
       }
     }.bind(this));
 
@@ -174,7 +178,6 @@
       this._set = {};
     }
     this._set[task.taskId] = set;
-    console.log(set);
   };
 
   exports.Thread = Thread;
