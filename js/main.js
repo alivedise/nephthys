@@ -1,7 +1,6 @@
 'use strict';
 
 (function(exports) {
-  var App = exports.App;
-  var app = new App();
-  exports.app = app;
+  self.broadcaster = new EventEmitter();
+  self.app = new self.App();
 }(this));

@@ -41,7 +41,6 @@
     mapContainer: document.getElementById('mapContainer'),
     slideContainer: $('#slideContainer'),
     init: function Isis_init() {
-      this.timeline = Raphael(document.getElementById('timeContainer'), this.WIDTH, this.TOP);
       source.addEventListener('change', this);
       this.random.addEventListener('click', this);
       var self = this;
@@ -96,13 +95,6 @@
     },
 
     resize: function Isis_resize(event) {
-      if (event && event.type && event.type === 'ui-resize' &&
-          this.WIDTH === $('#timeline').width()) {
-        return;
-      }
-      this.WIDTH = $('#timeline').width();
-
-      this.timeline.setSize(this.WIDTH, this.TOP);
       this.render();
     },
 
@@ -126,22 +118,7 @@
       // XXX: fix me
       this.end = object.end;
       this.interval = this.end - this.start;
-      this.slideContainer.children().remove();
-      this.slideContainer.append('<input type="text" class="span10" value="" id="slider" style="">');
       var self = this;
-      this.slider = $('#slider').slider({
-        min: this.start,
-        max: this.end,
-        step: 1,
-        value: [this.start, this.end]
-      }).on('slideStop', function(ev) {
-        var start = ev.value[0];
-        var end = ev.value[1];
-        var interval = end - start;
-        var scale = self.interval / interval;
-        var offset = (start - self.start) * scale;
-        self._render(start, end);
-      });
       if (Array.isArray(object.tasks)) {
         this.currentTasks = object.tasks;
       } else {
@@ -162,15 +139,6 @@
     _taskHeight: 10,
     _taskMinWidth: 1,
 
-    renderTimeline: function Isis_renderTimeline() {
-      this.timeline.clear();
-      this.timeline.arrow(0, 0, this.WIDTH, 0, 1, 'black');
-      this.timeline.text(0, 15, 'Time').attr('text-anchor', 'start').attr('color', '#ffffff');
-      for (var i = 0; i < 10; i++) {
-        this.timeline.text(i * this.WIDTH / 10, 15, (i * this.interval / 10));
-      }
-    },
-
     buildThreads: function() {
       this.currentThreads = {};
       if (!this.currentTasks)
@@ -188,18 +156,7 @@
       }
     },
 
-    _render: function Isis__render(start, end) {
-      this.clear();
-      this.interval = end - start;
-      this.start = start;
-      this.end = end;
-      this.renderTimeline();
-      var self = this;
-      //setTimeout(this.buildConnections.bind(this), 2000);
-    },
-
     render: function Isis_render() {
-      this.renderTimeline();
       this._colors = {};
       this._threadRendered = {};
       var self = this;

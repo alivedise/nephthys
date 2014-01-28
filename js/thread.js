@@ -17,7 +17,10 @@
   Thread.prototype.template = function() {
     this.instanceID = this.CLASS_NAME + _id;
     _id++;
-    return '<div class="thread" id="' + this.instanceID + '"></div>';
+    return '<div class="thread" id="' + this.instanceID + '">' +
+            '<div class="name">' + (this.config.tasks ? this.config.tasks[0].threadId : '') + '</div>' +
+            '<div class="canvas" id="' + this.instanceID + '-canvas"></div>' +
+            '</div>';
   };
 
   Thread.prototype.placeTasks = function() {
@@ -59,7 +62,7 @@
       this.HEIGHT = 500;
     }
     this._canvas =
-      Raphael(document.getElementById(this.instanceID),
+      Raphael(document.getElementById(this.instanceID + '-canvas'),
         this.WIDTH, this.HEIGHT);
     this.render();
   };
@@ -78,9 +81,6 @@
   };
 
   Thread.prototype.close = function() {
-    this.animationState = 'closing';
-    // ...
-    this.animationState = 'closed';
   };
 
   Thread.prototype.update = function() {
@@ -90,18 +90,16 @@
     if (this._rendered || !this.config.tasks) {
       return;
     }
-
     this._rendered = true;
 
     var self = this;
-    this.render_thread();
     var tasks = this.config.tasks;
     var ColorManager = window.app.colorManager;
     this.config.tasks.forEach(function(task) {
       (function(t) {
         setTimeout(function() {
           self.render_task(t, ColorManager.getColor(task.sourceEventId));
-        });
+        }.bind(this));
       }(task));
     }, this);
 
@@ -114,39 +112,26 @@
       }
     }.bind(this));
 
-    this.element.dblclick(function(evt) {
-      var x = evt.offsetX;
-      var y = evt.offsetY;
-      window.app.broadcaster.emit('zoom-in', x, y);
-    }.bind(this));
-
-    window.app.broadcaster.on('zoom-in', function(x, y) {
-      console.log(x, y, this);
-      this._canvas.setViewBox(x, y, this.WIDTH, this.HEIGHT, false);
+    window.broadcaster.on('timeline-range-changed', function(x, w) {
+      this._canvas.setViewBox(x, 0, w, this.HEIGHT, true);
     }.bind(this));
   };
 
-  Thread.prototype._offsetX = 200;
+  Thread.prototype._offsetX = 150;
   Thread.prototype._offsetY = 0;
   Thread.prototype._taskHeight = 10;
   Thread.prototype._intervalH = 15;
   Thread.prototype._taskMinWidth = 1;
-
-  Thread.prototype.render_thread = function() {
-    var threadRect = this._canvas.rect(3, 5, 120, 20).attr('fill', 'white');
-    var thread = this._canvas.text(15, 15, 'Thread: ' + this.config.tasks[0].threadId)
-                              .attr('text-anchor', 'start')
-                              .attr('color', '#ffffff').attr('font-size', 15);
-  };
 
   Thread.prototype.render_task = function(task, sourceEventColor) {
     // No dispatch time!
     if (task.dispatch === 0 && task.start !== 0) {
       task.dispatch = task.start;
     }
-    var lx = this.WIDTH * (task.dispatch - this.config.start) / this.config.interval + this._offsetX;
-    var ex = this.WIDTH * (task.start - this.config.start) / this.config.interval + this._offsetX;
-    var y = task.place_y * (this._taskHeight + this._intervalH) + this._offsetY;
+    this._canvas.setStart();
+    var lx = this.WIDTH * (task.dispatch - this.config.start) / this.config.interval;
+    var ex = this.WIDTH * (task.start - this.config.start) / this.config.interval;
+    var y = task.place_y * (this._taskHeight + this._intervalH);
     var lw = (this.WIDTH - this._offsetX) * (task.start - task.dispatch) / this.config.interval;
     var ew = (this.WIDTH - this._offsetX) * (task.end - task.start) / this.config.interval;
     var h = this._taskHeight;
@@ -157,12 +142,12 @@
     var latency = this._canvas.rect(lx, y, width, h);
     latency.attr('fill', c);
     latency.attr('opacity', 0.5);
-    latency.attr('stroke', 'black');
+    latency.attr('stroke', 'tranparent');
 
     /** Render execution **/
     var execution = this._canvas.rect(ex, y, ew, h);
     execution.attr('fill', c);
-    execution.attr('stroke', 'black');
+    execution.attr('stroke', 'transparent');
 
     /** Render label **/
     var label;
@@ -184,8 +169,12 @@
         'Start: ' + task.start + ' ' + 'Execution: ' + (task.end - task.start) + '\n' +
         'End: ' + task.end).attr('text-anchor', 'start');
     }
-    //latency.hover(show, function() { this.tooltipText.remove(); }, this, this);
-    //execution.hover(show, function() { this.tooltipText.remove(); }, this, this);
+    var set = this._canvas.setFinish();
+    if (!this._set) {
+      this._set = {};
+    }
+    this._set[task.taskId] = set;
+    console.log(set);
   };
 
   exports.Thread = Thread;

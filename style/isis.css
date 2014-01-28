@@ -6,7 +6,7 @@ textarea {
 }
 
 #ui-top {
-  padding-left: 175px;
+  padding-left: 150px;
 }
 
 /* Style For jQuery Layout */
@@ -31,4 +31,19 @@ textarea {
 #file-chooser a.btn {
   color: white;
   padding-top: 12px;
+}
+
+/* Style for threadUI */
+.thread > .name {
+  box-sizing: border-box;
+  width: 150px;
+  border: solid 1px silver;
+  display: inline-block;
+  float: left;
+}
+
+.thread > .canvas {
+  display: inline-block;
+  float: left;
+  width: calc(100% - 150px);
 }
