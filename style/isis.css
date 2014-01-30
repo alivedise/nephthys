@@ -6,7 +6,8 @@ textarea {
 }
 
 #ui-top {
-  padding-left: 150px;
+  padding-left: 70px;
+  overflow: hidden;
 }
 
 /* Style For jQuery Layout */
@@ -34,10 +35,13 @@ textarea {
 }
 
 /* Style for threadUI */
+.thread {
+  clear: both;
+}
+
 .thread > .name {
-  box-sizing: border-box;
-  width: 150px;
-  border: solid 1px silver;
+  text-align: center;
+  width: 70px;
   display: inline-block;
   float: left;
 }
@@ -45,5 +49,7 @@ textarea {
 .thread > .canvas {
   display: inline-block;
   float: left;
-  width: calc(100% - 150px);
+  width: calc(100% - 70px);
+  border: solid 1px silver;
+  border-bottom-width: 0;
 }

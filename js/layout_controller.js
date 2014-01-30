@@ -27,7 +27,7 @@
               self.publish('ui-resize');
             }
           , north__paneSelector:   "#ui-top"
-          , north__size:      50
+          , north__size:      20
           , spacing_open:     0  // ALL panes
           , spacing_closed:     0 // ALL panes
 

@@ -68,6 +68,8 @@
           return function(e) {
             self.source.value = e.target.result;
             self.parse(self.source.value);
+            window.broadcaster.emit('profile-imported-stage-0');
+            window.broadcaster.emit('profile-imported');
           };
         })(f);
 
@@ -112,7 +114,6 @@
     },
 
     parse: function Isis_parse(string) {
-      window.broadcaster && window.broadcaster.emit('profile-imported');
       this.clear(true);
       var object = JSON.parse(string);
       this.start = object.start;
@@ -171,70 +172,8 @@
           interval: this.interval
         });
       }
-    },
-
-    buildSourceEvents: function() {
-      this.currentSourceEvents = {};
-      this.currentSourceEventTypes = {};
-      if (!this.currentTasks)
-        return;
-
-      if (Array.isArray(this.currentTasks)) {
-        this.currentTasks.forEach(function iterator(task) {
-          if (!this.currentSourceEvents[task.sourceEventId]) {
-            this.currentSourceEvents[task.sourceEventId] = [];
-          }
-          this.currentSourceEvents[task.sourceEventId].push(task);
-
-          if (!this.currentSourceEventTypes[task.sourceEventType]) {
-            this.currentSourceEventTypes[task.sourceEventType] = [];
-          }
-          this.currentSourceEventTypes[task.sourceEventType].push(task.sourceEventId);
-        }, this);
-      }
-
-      this.publish('source-event-type-updated', this.currentSourceEventTypes);
-    },
-
-    buildConnections: function Isis_buildConnections(sourceEvents) {
-      this.buildSourceEvents();
-      for (var id in this.currentSourceEvents) {
-        var mission = this.currentSourceEvents[id];
-        if (!mission)
-          return;
-        mission.forEach(function(task, index) {
-          var taskId = task.taskId || task.id;
-          var previousTaskId = task.parentTaskId || task.parent;
-          if (!previousTaskId)
-            return;
-          var previousTaskSet = this.taskSets[previousTaskId];
-          var currentTaskSet = this.taskSets[taskId];
-
-          if (previousTaskSet) {
-            var x1 = currentTaskSet.position.x;
-            var y1 = previousTaskSet.position.y;
-            var x2 = currentTaskSet.position.x;
-            var y2 = currentTaskSet.position.y;
-            if ((previousTaskSet.model.threadId > currentTaskSet.model.threadId) ||
-                (previousTaskSet.model.threadId == currentTaskSet.model.threadId &&
-                 previousTaskSet.model.id > currentTaskSet.model.id)) {
-              y2 = y2 + this._taskHeight;
-            } else {
-              y1 = y1 + this._taskHeight;
-            }
-
-            //this.map.arrow(x1, y1, x2, y2, 2, this._colors[task.sourceEventId]);
-          }
-        }, this);
-      }
     }
   };
   Isis.init();
-
-  var done = function done(value) {
-    Isis.source.value = JSON.stringify(TaskTracer.dump());
-    Isis.parse(Isis.source.value);
-  };
-  TaskTracer.run(done);
   window.Isis = Isis;
 }(this));
