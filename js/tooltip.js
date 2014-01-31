@@ -39,12 +39,21 @@
       if (this.element.find('.taskId').text() === String(task.taskId)) {
         return;
       }
+      this.element.find('.labels').remove();
       this.element.find('.taskId').text(task.taskId);
       this.element.find('.sourceEventId').text(task.sourceEventId);
       this.element.find('.sourceEventType').text(task.sourceEventType);
       this.element.find('.execution').text(task.end - task.start);
       this.element.find('.latency').text(task.start - task.dispatch);
       this.element.find('.colorSample').css({ color: window.app.colorManager.getColor(task.sourceEventId)});
+      
+      if (task.labels && task.labels.length) {
+        this.element.append('<div class="labels"><hr/></div>');
+        task.labels.forEach(function(label) {
+          this.element.find('.labels').append('<div><span class="label label-info">'+label.timestamp+'</span><span>'+label.label+'</span></div>')
+        }, this);
+      }
+
       this.element.show().css({ left: x, top: y });
     }.bind(this));
     window.broadcaster.on('-task-out', function(task, x, y) {
