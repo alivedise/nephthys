@@ -23,6 +23,10 @@
     return [linePath, arrowPath];
   }
 
+  Raphael.el.is_visible = function() {
+    return (this.node.style.display !== 'none');
+  }
+
   var Isis = {
     random: document.getElementById('random'),
     TIME_FACTOR: 0.5,
@@ -66,10 +70,10 @@
         // Closure to capture the file information.
         reader.onload = (function(theFile) {
           return function(e) {
-            self.source.value = e.target.result;
-            self.parse(self.source.value);
             window.broadcaster.emit('profile-imported-stage-0');
             window.broadcaster.emit('profile-imported');
+            self.source.value = e.target.result;
+            self.parse(self.source.value);
           };
         })(f);
 
@@ -131,6 +135,7 @@
       }
 
       this.buildThreads();
+      this.buildSourceEvents();
 
       this.resize();
     },
@@ -145,17 +150,30 @@
       this.currentThreads = {};
       if (!this.currentTasks)
         return;
-      if (Array.isArray) {
-        this.currentTasks.forEach(function iterator(task) {
-          if (!this.currentThreads[task.threadId]) {
-            this.currentThreads[task.threadId] = [];
-          }
-          if (task.sourceEventId === null) {
-            return;
-          }
-          this.currentThreads[task.threadId].push(task);
-        }, this);
-      }
+      this.currentTasks.forEach(function iterator(task) {
+        if (!this.currentThreads[task.threadId]) {
+          this.currentThreads[task.threadId] = [];
+        }
+        if (task.sourceEventId === null) {
+          return;
+        }
+        this.currentThreads[task.threadId].push(task);
+      }, this);
+    },
+
+    buildSourceEvents: function() {
+      this.currentSourceEvents = {};
+      if (!this.currentTasks)
+        return;
+      this.currentTasks.forEach(function iterator(task) {
+        if (!this.currentSourceEvents[task.sourceEventType]) {
+          this.currentSourceEvents[task.sourceEventType] = [];
+        }
+        if (task.sourceEventId === null) {
+          return;
+        }
+        this.currentSourceEvents[task.sourceEventType].push(task);
+      }, this);
     },
 
     render: function Isis_render() {
@@ -170,6 +188,13 @@
           start: this.start,
           end: this.end,
           interval: this.interval
+        });
+      }
+
+      for (var id in this.currentSourceEvents) {
+        var sourceEventType = new SourceEventType({
+          type: id,
+          tasks: this.currentSourceEvents[id]
         });
       }
     }

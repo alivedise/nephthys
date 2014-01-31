@@ -12,6 +12,21 @@
       this.colorManager = new ColorManager();
       this.broadcaster = window.broadcaster;
       this.timeline = new Timeline();
+      this.tooltip = new Tooltip();
+      this.register();
+    },
+    _threads: [],
+    register: function() {
+      window.broadcaster.on('profile-imported', this._on_profile_imported.bind(this));
+      window.broadcaster.on('-thread-created', this._on_thread_created.bind(this));
+    },
+    _on_thread_created: function(thread) {
+      this._threads.push(thread);
+    },
+    _on_profile_imported: function() {
+      this._threads.forEach(function(thread) {
+        thread.destroy();
+      }, this);
     }
   };
 

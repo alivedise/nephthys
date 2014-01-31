@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8">
     <title>Project Isis</title>
-    <link rel="stylesheet" type="text/css" href="style/isis.css">
     <link rel="stylesheet" type="text/css" href="style/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/slider.css">
     <link rel="stylesheet" type="text/css" href="lib/bootstrap-select/bootstrap-select.min.css">
@@ -19,25 +19,21 @@
     <script src="lib/EventEmitter/EventEmitter.js" defer></script>
     <script src="js/color_manager.js" defer></script>
     <script src="js/thread.js" defer></script>
+    <script src="js/source_event_type.js" defer></script>
 
     <script src="js/filter.js" defer></script>
-
+    <script src="js/tooltip.js" defer></script>
     <script src="js/map.js" defer></script>
     <script src="js/timeline.js" defer></script>
     <script src="js/app.js" defer></script>
     <script src="js/main.js" defer></script>
+    <link rel="stylesheet" type="text/css" href="style/isis.css">
   </head>
   <body>
     <header class="navbar navbar-inverse layout-north" role="banner">
       <div class="container">
         <div class="navbar-header">
-          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a href="./" class="navbar-brand">Isis v0.2.0</a>
+          <a href="./" class="navbar-brand">Isis v0.2.0 <h4>TaskTracer GUI</h4></a>
         </div>
         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
           <ul class="nav navbar-nav">
@@ -53,7 +49,7 @@
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li>
-              <a href="./about">About</a>
+              <a href="./">About</a>
             </li>
           </ul>
         </nav>
@@ -65,34 +61,42 @@
       <form class="form-horizontal">
         <fieldset>
           <!-- Form Name -->
-          <legend>Filters</legend>
-
-          <!-- Text input-->
-          <div class="control-group">
-            <label class="control-label" for="filter">Filter text</label>
-            <div class="controls">
-              <input id="filter" name="filter" type="text" placeholder="placeholder" class="input-xlarge">
-              
-            </div>
-          </div>
-
-          <!-- Multiple Radios -->
-          <div class="control-group">
-            <label class="control-label" for="tag">Contains tasks</label>
-            <div class="controls">
-              <label class="radio" for="tag-0">
-                <input type="radio" name="tag" id="tag-0" value="User Label" checked="checked">
-                User Label
-              </label>
-              <label class="radio" for="tag-1">
-                <input type="radio" name="tag" id="tag-1" value="No label">
-                No label
-              </label>
-            </div>
-          </div>
+          <legend><span class="glyphicon glyphicon-filter"></span>Filters</legend>
+          <legend><small>Filter label</small></legend>
 
           <!-- Select Multiple -->
-          <div class="control-group">
+          <div class="input-group">
+            <label class="control-label" for="bySourceEventId">By labels</label>
+            <div class="controls">
+              <select id="byLabel" name="byLabel" class="input-xlarge" multiple="multiple" class="selectpicker">
+              </select>
+            </div>
+          </div>
+
+          <legend><small>Toggles</small></legend>
+
+          <div class="input-group">
+            <div class="btn-group" id="label-filter">
+              <button type="button" class="btn btn-info active" id="not-label-only">All <span class="badge" id="taskCount"></span></button>
+              <button type="button" class="btn btn-info" id="label-only">Labels only <span class="badge" id="labelCount"></span></button>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <button type="button" class="btn btn-warning" id="clear-filter">Clear all filter</button>
+          </div>
+
+          <div class="input-group">
+            <div class="btn-group" id="thread-filter">
+              <button type="button" class="btn btn-sample active" id="open-all-threads">Open /</button>
+              <button type="button" class="btn btn-sample" id="close-all-threads">Close all threads</button>
+            </div>
+          </div>
+
+          <legend><small>Filter id</small></legend>
+
+          <!-- Select Multiple -->
+          <div class="input-group">
             <label class="control-label" for="bySourceEventType">By source event type</label>
             <div class="controls">
               <select id="bySourceEventType" name="bySourceEventType" class="input-xlarge" multiple="multiple" class="selectpicker">
@@ -101,7 +105,7 @@
           </div>
 
           <!-- Select Multiple -->
-          <div class="control-group">
+          <div class="input-group">
             <label class="control-label" for="bySourceEventId">By source event ID</label>
             <div class="controls">
               <select id="bySourceEventId" name="bySourceEventId" class="input-xlarge" multiple="multiple" class="selectpicker">
@@ -114,6 +118,7 @@
     <div class="layout-center">
       <div id="ui-top">
         <div id="timeContainer"></div>
+        <div id="ruler"></div>
       </div>
       <div id="timeline"></div>
     </div>
