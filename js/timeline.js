@@ -51,7 +51,8 @@
     }.bind(this));
   };
   Timeline.prototype._on_mousedown = function(evt) {
-    evt.offsetX = evt.originalEvent.layerX;
+    if (typeof(evt.offsetX) == "undefined")
+      evt.offsetX = evt.originalEvent.layerX;
     if (!this.ENABLED) {
       return;
     }
@@ -59,7 +60,8 @@
     this._start = x;
   };
   Timeline.prototype._on_mousemove = function(evt) {
-    evt.offsetX = evt.originalEvent.layerX;
+    if (typeof(evt.offsetX) == "undefined")
+      evt.offsetX = evt.originalEvent.layerX;
     if (!this.ENABLED || !this._start) {
       return;
     }
@@ -67,7 +69,8 @@
     this.range.attr('x', this._start).attr('width', x - this._start).show();
   };
   Timeline.prototype._on_mouseup = function(evt) {
-    evt.offsetX = evt.originalEvent.layerX;
+    if (typeof(evt.offsetX) == "undefined")
+      evt.offsetX = evt.originalEvent.layerX;
     if (!this.ENABLED) {
       return;
     }
