@@ -57,6 +57,7 @@
       this.element.show().css({ left: x, top: y });
     }.bind(this));
     window.broadcaster.on('-task-out', function(task, x, y) {
+      this.element.find('.taskId').remove();
       this.element.hide();
     }.bind(this));
   };
