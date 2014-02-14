@@ -1,3 +1,4 @@
+/* -*- Mode: Javascript; tab-width: 2; indent-tabs-mode: nil; js-indent-level: 2 -*- */
 (function(exports) {
   var Tooltip = function() {
     this.init();
@@ -57,7 +58,7 @@
       this.element.show().css({ left: x, top: y });
     }.bind(this));
     window.broadcaster.on('-task-out', function(task, x, y) {
-      this.element.find('.taskId').remove();
+      this.element.find('.taskId').text("");
       this.element.hide();
     }.bind(this));
   };
