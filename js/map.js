@@ -148,11 +148,20 @@
 
     buildThreads: function() {
       this.currentThreads = {};
+      this.currentProcessThreads = {}
       if (!this.currentTasks)
         return;
       this.currentTasks.forEach(function iterator(task) {
+        if (!task.threadId) {
+          return;
+        }
         if (!this.currentThreads[task.threadId]) {
           this.currentThreads[task.threadId] = [];
+          // Group threads into processes
+          if (!this.currentProcessThreads[task.processId]) {
+            this.currentProcessThreads[task.processId] = [];
+          }
+          this.currentProcessThreads[task.processId].push(task.threadId);
         }
         if (task.sourceEventId === null) {
           return;
@@ -180,7 +189,24 @@
       this._colors = {};
       this._threadRendered = {};
       var self = this;
-      for (var id in this.currentThreads) {
+
+      // Collect all process ids
+      var procs = [];
+      for (var proc in this.currentProcessThreads) {
+        procs.push(proc);
+      }
+      procs.sort();
+
+      // concat threads of processes into a list
+      var ids = [];
+      for (var idx in procs) {
+        var proc = procs[idx];
+        this.currentProcessThreads[proc].sort();
+        ids = ids.concat(this.currentProcessThreads[proc]);
+      }
+
+      for (var idx in ids) {
+        var id = ids[idx];
         var thread = new Thread({
           id: id,
           tasks: this.currentThreads[id],
