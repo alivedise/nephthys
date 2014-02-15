@@ -366,6 +366,19 @@
         window.broadcaster.emit('-task-out');
       }
     }.bind(this));
+
+    /* Render separators of levels of nested event loops */
+    if (this.levelStarts.length >= 3) {
+      var separators = this.levelStarts.splice(1, this.levelStarts.length - 2);
+      separators.forEach(function(separator) {
+        var y = (separator - 1) * (self._taskHeight + self._intervalH) +
+          self._taskHeight / 2;
+        var g = self._canvas.path('M 0 ' + y + ' l ' + self.WIDTH + ' 0')
+          .attr('fill', 'none')
+          .attr('stroke-width', 0.1)
+          .attr('stroke', 'green');
+      });
+    }
   };
 
   Thread.prototype._offsetX = 150;
