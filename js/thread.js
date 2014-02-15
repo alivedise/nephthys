@@ -1,3 +1,4 @@
+/* -*- Mode: Javascript; tab-width: 2; indent-tabs-mode: nil; js-indent-level: 2 -*- */
 'use strict';
 
 (function(exports) {
@@ -37,31 +38,106 @@
             '</div>';
   };
 
-  Thread.prototype.placeTasks = function() {
-    function _pickbag(bags) {
+  Thread.prototype.createNestedLoopTree = function(tasks) {
+    function _createNestedLoopTree(tasks) {
+      var leveltasks = [];
+      for (var i = 0; i < tasks.length;) {
+        var cur;
+        cur = tasks[i++];
+        leveltasks.push(cur);
+        var nested = [];
+        while (i < tasks.length && cur.end > tasks[i].start) {
+          nested.push(tasks[i++]);
+        }
+        if (nested.length) {
+          cur.nested = _createNestedLoopTree(nested);
+        }
+      }
+
+      return leveltasks;
+    }
+
+    tasks.sort(function order_outer_first(t1, t2) {
+      return (t1.start - t2.start) || (t2.end - t1.end);
+    });
+    return _createNestedLoopTree(tasks);
+  };
+
+  Thread.prototype._getBags = function(level) {
+    while (this.bagsStack.length <= level) {
+      this.bagsStack.push([0]);
+    }
+    return this.bagsStack[level];
+  };
+
+  Thread.prototype.placeTasksNested = function(parent, level) {
+    var self = this;
+    function _pickbag(bags, taskdispatch) {
       var min = 0;
       for (var i = 0; i < bags.length; i++) {
         if (bags[min] > bags[i]) {
           min = i;
         }
+        // Or first bag that could keep the task.
+        if (bags[i] > (taskdispatch - 1000)) {
+          continue;
+        }
+        return i;
       }
       return min;
     }
 
     var thread_first_y = 0;
-    var tasks = this.config.tasks;
-    var bags = [0];
-    tasks.sort(function(t1, t2) { return t1.dispatch - t2.dispatch; });
-    tasks.forEach(function(task) {
-      var bag_i = _pickbag(bags);
+
+    var leveltasks = parent.nested;
+    var bags = this._getBags(level);
+    leveltasks.sort(function(t1, t2) { return t1.dispatch - t2.dispatch; });
+    leveltasks.forEach(function(task) {
+      var bag_i = _pickbag(bags, task.dispatch);
       if (bags[bag_i] > task.dispatch) {
         bag_i = bags.length;
         bags.push(0);
       }
       task.place_y = bag_i;
       bags[bag_i] = task.end;
+
+      task.level = level;
+      if (task.nested) {
+        self.placeTasksNested(task, level + 1);
+      }
     });
-    this.bags = bags;
+  };
+
+  Thread.prototype.computeLevelStarts = function() {
+    var levelStarts = [0];
+    this.bagsStack.forEach(function(bags) {
+      var start = levelStarts[levelStarts.length - 1] + bags.length + 1;
+      levelStarts.push(start);
+    });
+    levelStarts[levelStarts.length - 1]--;
+    this.levelStarts = levelStarts;
+  };
+
+  Thread.prototype.adjustTasksByLevelStarts = function() {
+    var self = this;
+    this.config.tasks.forEach(function(task) {
+      task.place_y = task.place_y + self.levelStarts[task.level];
+    });
+  };
+
+  Thread.prototype.placeTasks = function() {
+    var root = new Object();
+    root.nested = this.createNestedLoopTree(this.config.tasks);
+    this.bagsStack = [];        /* Bag lists for levels, every level
+                                 * of nested event loops has a list of
+                                 * bags for keep tasks ran on the
+                                 * loops of the level. */
+    this.placeTasksNested(root, 0);
+    this.computeLevelStarts();
+    this.adjustTasksByLevelStarts();
+    this.config.tasks.sort(function order_dispatch_time(t1, t2) {
+      return t1.dispatch - t2.dispatch;
+    });
   };
 
   Thread.prototype.init = function() {
@@ -71,10 +147,13 @@
       'name': this.element.find('.name > .btn'),
       'toggle': this.element.find('.name > .btn > span')
     };
+
     this.placeTasks();
+
     this.WIDTH = $('#timeline').width() - this._offsetX;
-    if (this.bags) {
-      this.HEIGHT = (this.bags.length + 1) * (this._intervalH + this._taskHeight);
+    var num_bags = this.levelStarts[this.levelStarts.length - 1];
+    if (num_bags) {
+      this.HEIGHT = (num_bags + 1) * (this._intervalH + this._taskHeight);
     } else {
       this.HEIGHT = 500;
     }
