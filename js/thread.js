@@ -391,17 +391,23 @@
 
     /** Render latency **/
     var width = (lw + ew) > this._taskMinWidth ? (lw + ew) : this._taskMinWidth;
-    var latency = this._canvas.rect(lx, y, width, h)
+    var latency = this._canvas.rect(lx, y, lw, h)
                               .attr('fill', c)
                               .attr('opacity', 0.5)
-                              .attr('stroke', 'transparent')
+                              .attr('stroke-width', 0)
                               .data('task', task);
 
     /** Render execution **/
     var execution = this._canvas.rect(ex, y, ew, h)
                                 .attr('fill', c)
-                                .attr('stroke', 'transparent')
+                                .attr('stroke-width', 0)
                                 .data('task', task);
+
+    /** Render life span **/
+    var life = this._canvas.path("M" + lx + " " + (y + h / 2) + " l" + lw + " 0")
+                           .attr('stroke-width', 1)
+                           .attr('stroke', c)
+                           .data('task', task);
 
     /** Render label **/
     /**
@@ -431,6 +437,7 @@
     task.view = {
       latency: latency,
       execution: execution,
+      life: life,
       set: set
     };
     task.rendered = true;
