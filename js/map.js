@@ -210,6 +210,7 @@
         var thread = new Thread({
           id: id,
           tasks: this.currentThreads[id],
+          processId: this.currentThreads[id][0].processId,
           name: '',
           start: this.start,
           end: this.end,

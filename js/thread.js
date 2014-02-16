@@ -30,10 +30,12 @@
   Thread.prototype.CLASS_NAME = 'thread-';
 
   Thread.prototype.template = function() {
+    var ColorManager = window.app.colorManager;
+    var bgcolor = ColorManager.getColor(this.config.processId);
     this.instanceID = this.CLASS_NAME + _id;
     _id++;
     return '<div class="thread" id="' + this.instanceID + '">' +
-            '<div class="name"><button class="btn-sm btn btn-default">' + (this.config.tasks ? this.config.tasks[0].threadId : '') + ' <span class="glyphicon glyphicon-chevron-up"></span></button></div>' +
+            '<div class="name"><button class="btn-sm btn btn-default" style="background-color: ' + bgcolor + ';">' + (this.config.tasks ? this.config.tasks[0].threadId : '') + ' <span class="glyphicon glyphicon-chevron-up"></span></button></div>' +
             '<div class="canvas" id="' + this.instanceID + '-canvas"></div>' +
             '</div>';
   };
@@ -325,7 +327,7 @@
     window.broadcaster.emit('-thread-destroyed');
   };
 
-  Thread.prototype.render = function(task) {
+  Thread.prototype.render = function() {
     if (this._rendered || !this.config.tasks) {
       return;
     }
