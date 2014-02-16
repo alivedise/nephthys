@@ -327,6 +327,35 @@
     window.broadcaster.emit('-thread-destroyed');
   };
 
+  var render_tasks = [];
+  var render_running = false;
+
+  function schedule_runners() {
+    if (render_tasks.length == 0 || render_running) {
+      return;
+    }
+
+    render_running = true;
+
+    function _run_runner() {
+      if (render_tasks.length == 0) {
+        render_running = false;
+        return;
+      }
+      window.setTimeout(function() {
+        var runner = render_tasks[0];
+        render_tasks.splice(0, 1);
+        runner();
+        _run_runner();
+      });
+    }
+    _run_runner();
+  }
+  function dispatch_runner(runner) {
+    render_tasks.push(runner);
+    schedule_runners();
+  }
+
   Thread.prototype.render = function() {
     if (this._rendered || !this.config.tasks) {
       return;
@@ -350,13 +379,20 @@
       .hide();
 
     /* Render tasks */
-    this.config.tasks.forEach(function(task) {
-      (function(t) {
-        setTimeout(function() {
-          self.render_task(t, ColorManager.getColor(task.sourceEventId));
-        }.bind(this));
-      }(task));
-    }, this);
+    function create_runner(tasks) {
+      function _runner() {
+        tasks.forEach(function(task) {
+          self.render_task(task, ColorManager.getColor(task.sourceEventId));
+        });
+      }
+      return _runner;
+    }
+
+    var run_size = 200;
+    for (var i = 0; i < this.config.tasks.length; i += run_size) {
+      var render_content = this.config.tasks.slice(i, i + run_size);
+      dispatch_runner(create_runner(render_content));
+    }
 
     this.element.mousemove(function(evt) {
       var x = evt.pageX;
@@ -371,7 +407,7 @@
 
     /* Render separators of levels of nested event loops */
     if (this.levelStarts.length >= 3) {
-      var separators = this.levelStarts.splice(1, this.levelStarts.length - 2);
+      var separators = this.levelStarts.slice(1, -1);
       separators.forEach(function(separator) {
         var y = (separator - 1) * (self._taskHeight + self._intervalH) +
           self._taskHeight / 2;
