@@ -384,6 +384,7 @@
       var y = evt.pageY;
       var ele = this._canvas.getElementByPoint(x, y);
       if (ele && ele.data('task')) {
+        console.log(ele.getBBox());
         window.broadcaster.emit('-task-hovered', ele.data('task'), x, y);
       } else {
         window.broadcaster.emit('-task-out');

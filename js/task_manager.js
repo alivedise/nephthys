@@ -4,6 +4,7 @@
   var TaskManager = function(app) {
     this.app = app;
     window.broadcaster.on('-task-rendered', this.addTask.bind(this));
+    window.broadcaster.on('-source-event-id-filtered', this.buildConnections.bind(this));
     window.broadcaster.on('profile-imported-stage-0', this.init.bind(this));
   };
   TaskManager.prototype = new EventEmitter();
@@ -26,6 +27,12 @@
         break;
       }
     };
+  };
+
+  TaskManager.prototype.buildConnections = function(id) {
+    if (!id in this._tasks) {
+      return;
+    }
   };
 
   exports.TaskManager = TaskManager;

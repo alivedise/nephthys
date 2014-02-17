@@ -367,7 +367,6 @@
     }
   };
 
-  window.ThreadManager = ThreadManager;
   window.TimeMachine = TimeMachine;
   window.TaskTracer = TaskTracer;
 }(this));
