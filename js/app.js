@@ -13,6 +13,7 @@
       this.broadcaster = window.broadcaster;
       this.timeline = new Timeline();
       this.tooltip = new Tooltip();
+      this.taskManager = new TaskManager(this);
       this.register();
     },
     _threads: [],

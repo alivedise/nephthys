@@ -1,7 +1,8 @@
 'use strict';
 
 (function(exports) {
-  var TaskManager = function(config) {
+  var TaskManager = function(app) {
+    this.app = app;
     window.broadcaster.on('-task-rendered', this.addTask.bind(this));
     window.broadcaster.on('profile-imported-stage-0', this.init.bind(this));
   };

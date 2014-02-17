@@ -51,6 +51,7 @@
       } else {
         this.element.find('[name="tooltip-source-event-id"]').prop('checked', false);
       }
+      console.log(task);
       this.element.find('.labels').remove();
       this.element.find('.taskId').text(task.taskId);
       this.element.find('.sourceEventId').text(task.sourceEventId);

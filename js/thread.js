@@ -491,7 +491,7 @@
     };
     task.rendered = true;
 
-    window.broadcaster.emit('-task-rendered', ex, ew, task.threadId);
+    window.broadcaster.emit('-task-rendered', task, ex, ew, task.threadId);
   };
 
   Thread.prototype.highlight = function(element) {
