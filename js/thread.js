@@ -17,6 +17,7 @@
   Thread.prototype.LISTENERS = {
     'open-all-threads': 'open',
     'close-all-threads': 'close',
+    '-filter-source-event-ids': '_filter_source_event_ids',
     '-filter-source-event-id': '_filter_source_event_id',
     '-filter-label': '_filter_label',
     '-filter-cleared': 'showAllTasks',
@@ -188,7 +189,7 @@
     this._canvas.setViewBox(x, 0, w, this.HEIGHT, true);
   };
 
-  Thread.prototype._filter_source_event_id = function(ids) {
+  Thread.prototype._filter_source_event_ids = function(ids) {
     if (!ids) {
       this.showAllTasks();
       return;
@@ -196,6 +197,25 @@
     var found = false;
     this.config.tasks.forEach(function(task) {
       if (ids.indexOf(String(task.sourceEventId)) >= 0) {
+        found = true;
+        task.view.set.show();
+      } else {
+        task.view.set.hide();
+      }
+    }, this);
+    if (!found) {
+      this.close();
+    }
+  };
+
+  Thread.prototype._filter_source_event_id = function(id) {
+    if (!id) {
+      this.showAllTasks();
+      return;
+    }
+    var found = false;
+    this.config.tasks.forEach(function(task) {
+      if (id === task.sourceEventId) {
         found = true;
         task.view.set.show();
       } else {
@@ -358,12 +378,25 @@
       }(task));
     }, this);
 
+    /** Trigger tooltip for tasks */
     this.element.mousemove(function(evt) {
       var x = evt.pageX;
       var y = evt.pageY;
       var ele = this._canvas.getElementByPoint(x, y);
       if (ele && ele.data('task')) {
         window.broadcaster.emit('-task-hovered', ele.data('task'), x, y);
+      } else {
+        window.broadcaster.emit('-task-out');
+      }
+    }.bind(this));
+
+    /** Focus the element to show the connections */
+    this.element.click(function(evt) {
+      var x = evt.pageX;
+      var y = evt.pageY;
+      var ele = this._canvas.getElementByPoint(x, y);
+      if (ele && ele.data('task')) {
+        window.broadcaster.emit('-task-focused', ele.data('task'), x, y);
       } else {
         window.broadcaster.emit('-task-out');
       }
@@ -449,6 +482,7 @@
 
     var set = this._canvas.setFinish();
     task.y = y;
+    task.x = lx;
     task.view = {
       latency: latency,
       execution: execution,

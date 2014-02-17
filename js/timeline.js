@@ -40,7 +40,7 @@
 
     this._miniThreads = {};
     this._miniThreadsCount = 1;
-    window.broadcaster.on('-task-rendered', function(x, w, tid) {
+    window.broadcaster.on('-task-rendered', function(task, x, w, tid) {
       if (!this._miniThreads[tid]) {
         this._miniThreads[tid] = this._miniThreadsCount++;
       }

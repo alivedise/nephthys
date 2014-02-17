@@ -30,6 +30,7 @@
     window.broadcaster.on('profile-imported-stage-0', this.clear.bind(this));
     window.broadcaster.on('-label-rendered', this.addLabel.bind(this));
     window.broadcaster.on('-task-rendered', this.addTask.bind(this));
+    window.broadcaster.on('-source-event-id-filtered', this.filterBySourceEventId.bind(this));
     $('#label-filter button').click(function() {
       $('#label-filter button').addClass('active').not(this).removeClass('active');
       window.broadcaster.emit('-filter-label-toggle', (this.id === 'label-only'));
@@ -38,6 +39,12 @@
       $('#thread-filter button').addClass('active').not(this).removeClass('active');
       window.broadcaster.emit(this.id);
     });
+  };
+
+  proto.filterBySourceEventId = function(id) {
+    this.clear();
+    window.broadcaster.emit('-filter-source-event-id', id); 
+    this.activeSourceEventId = id;
   };
 
   proto.addLabel = function(label) {
@@ -57,6 +64,7 @@
   };
 
   proto.clear = function() {
+    this.activeSourceEventId = null;
     this.typeSelector.html('');
     this.idSelector.html('');
     this.labelSelector.html('');
@@ -92,7 +100,7 @@
   };
 
   proto.emitId = function(evt) {
-    window.broadcaster.emit('-filter-source-event-id', $(evt.target).val());
+    window.broadcaster.emit('-filter-source-event-ids', $(evt.target).val());
   };
 
   proto.emitLabel = function(evt) {

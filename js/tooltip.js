@@ -1,5 +1,9 @@
 /* -*- Mode: Javascript; tab-width: 2; indent-tabs-mode: nil; js-indent-level: 2 -*- */
 (function(exports) {
+  /**
+   * Tooltip for task.
+   * @requires Filter
+   */
   var Tooltip = function() {
     this.init();
   };
@@ -13,6 +17,7 @@
               '<div><span>SourceEventID</span><span class="label label-default pull-right"><span class="colorSample">█ </span><span class="sourceEventId"></span></span></div>' +
               '<div><span>Latency</span><span class="latency label label-info pull-right"></span></div>' +
               '<div><span>Execution</span><span class="execution label label-info pull-right"></span></div>' +
+              '<div><input type="checkbox" name="tooltip-source-event-id" value="" /></button><label>Show relavant tasks only.</label></div>' +
             '</div>';
   };
 
@@ -36,9 +41,15 @@
       return;
     }
     this._registered = true;
+
     window.broadcaster.on('-task-hovered', function(task, x, y) {
       if (this.element.find('.taskId').text() === String(task.taskId)) {
         return;
+      }
+      if (window.app.filter && window.app.filter.activeSourceEventId == task.sourceEventId) {
+        this.element.find('[name="tooltip-source-event-id"]').prop('checked', true);
+      } else {
+        this.element.find('[name="tooltip-source-event-id"]').prop('checked', false);
       }
       this.element.find('.labels').remove();
       this.element.find('.taskId').text(task.taskId);
@@ -47,7 +58,13 @@
       this.element.find('.execution').text(task.end - task.start);
       this.element.find('.latency').text(task.start - task.dispatch);
       this.element.find('.colorSample').css({ color: window.app.colorManager.getColor(task.sourceEventId)});
-      
+      this.element.find('[name="tooltip-source-event-id"]').change(function(){
+        if ($(this).is(':checked')) {
+          window.broadcaster.emit('-source-event-id-filtered', task.sourceEventId);
+        } else {
+          window.broadcaster.emit('-source-event-id-filtered');
+        }
+      });
       if (task.labels && task.labels.length) {
         this.element.append('<div class="labels"><hr/></div>');
         task.labels.forEach(function(label) {
