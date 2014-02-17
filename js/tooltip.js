@@ -18,6 +18,7 @@
               '<div><span>SourceEventID</span><span class="label label-default pull-right"><span class="colorSample">█ </span><span class="sourceEventId"></span></span></div>' +
               '<div><span>Latency</span><span class="latency label label-info pull-right"></span></div>' +
               '<div><span>Execution</span><span class="execution label label-info pull-right"></span></div>' +
+              '<div><span>Thread ID of parent task</span><span class="parent-task-thread-id label label-info pull-right"></span></div>' +
             '</div>';
   };
 
@@ -66,7 +67,9 @@
         }
       });
       if (task.parentTask) {
-        this.element.append('<div><span>Thread ID of parent task</span><span class="parent-thread label label-info pull-right">'+task.parentTask.threadId+'</span></div>');
+        this.element.find('.parent-task-thread-id').text(task.parentTask.threadId);
+      } else {
+        this.element.find('.parent-task-thread-id').text('');
       }
       if (task.labels && task.labels.length) {
         this.element.append('<div class="labels"><hr/></div>');
@@ -79,6 +82,7 @@
     window.broadcaster.on('-task-out', function(task, x, y) {
       this.element.find('.taskId').text("");
       this.element.hide();
+      this.element.find('.labels').remove();
     }.bind(this));
   };
 
