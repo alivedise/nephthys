@@ -12,12 +12,12 @@
   Tooltip.prototype.containerElement = $('body');
   Tooltip.prototype.template = function() {
     return '<div class="alert alert-info isis-tooltip" id="isis-tooltip">' +
+              '<div><input type="checkbox" name="tooltip-source-event-id" value="" /></button><label>Show relavant tasks only.</label></div>' +
               '<div><span>TaskID</span><span class="taskId label label-default pull-right"></span></div>' +
               '<div><span>SourceEventType</span><span class="sourceEventType label label-default pull-right"></span></div>' +
               '<div><span>SourceEventID</span><span class="label label-default pull-right"><span class="colorSample">█ </span><span class="sourceEventId"></span></span></div>' +
               '<div><span>Latency</span><span class="latency label label-info pull-right"></span></div>' +
               '<div><span>Execution</span><span class="execution label label-info pull-right"></span></div>' +
-              '<div><input type="checkbox" name="tooltip-source-event-id" value="" /></button><label>Show relavant tasks only.</label></div>' +
             '</div>';
   };
 
@@ -51,7 +51,6 @@
       } else {
         this.element.find('[name="tooltip-source-event-id"]').prop('checked', false);
       }
-      console.log(task);
       this.element.find('.labels').remove();
       this.element.find('.taskId').text(task.taskId);
       this.element.find('.sourceEventId').text(task.sourceEventId);
@@ -66,13 +65,15 @@
           window.broadcaster.emit('-source-event-id-filtered');
         }
       });
+      if (task.parentTask) {
+        this.element.append('<div><span>Thread ID of parent task</span><span class="parent-thread label label-info pull-right">'+task.parentTask.threadId+'</span></div>');
+      }
       if (task.labels && task.labels.length) {
         this.element.append('<div class="labels"><hr/></div>');
         task.labels.forEach(function(label) {
           this.element.find('.labels').append('<div><span class="label label-info">'+label.timestamp+'</span><span>'+label.label+'</span></div>')
         }, this);
       }
-
       this.element.show().css({ left: x, top: y });
     }.bind(this));
     window.broadcaster.on('-task-out', function(task, x, y) {
