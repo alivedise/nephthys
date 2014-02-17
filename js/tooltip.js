@@ -67,7 +67,7 @@
         }
       });
       if (task.parentTask) {
-        this.element.find('.parent-task-thread-id').text(task.parentTask.threadId);
+        this.element.find('.parent-task-thread-id').text(task.parentTask.threadId).css({ backgroundColor: window.app.colorManager.getColor(task.parentTask.threadId)});
       } else {
         this.element.find('.parent-task-thread-id').text('');
       }
@@ -82,7 +82,6 @@
     window.broadcaster.on('-task-out', function(task, x, y) {
       this.element.find('.taskId').text("");
       this.element.hide();
-      this.element.find('.labels').remove();
     }.bind(this));
   };
 
