@@ -327,35 +327,6 @@
     window.broadcaster.emit('-thread-destroyed');
   };
 
-  var render_tasks = [];
-  var render_running = false;
-
-  function schedule_runners() {
-    if (render_tasks.length == 0 || render_running) {
-      return;
-    }
-
-    render_running = true;
-
-    function _run_runner() {
-      if (render_tasks.length == 0) {
-        render_running = false;
-        return;
-      }
-      window.setTimeout(function() {
-        var runner = render_tasks[0];
-        render_tasks.splice(0, 1);
-        runner();
-        _run_runner();
-      });
-    }
-    _run_runner();
-  }
-  function dispatch_runner(runner) {
-    render_tasks.push(runner);
-    schedule_runners();
-  }
-
   Thread.prototype.render = function() {
     if (this._rendered || !this.config.tasks) {
       return;
@@ -391,7 +362,8 @@
     var run_size = 200;
     for (var i = 0; i < this.config.tasks.length; i += run_size) {
       var render_content = this.config.tasks.slice(i, i + run_size);
-      dispatch_runner(create_runner(render_content));
+      window.broadcaster.emit('-friendly-runner',
+                              create_runner(render_content));
     }
 
     this.element.mousemove(function(evt) {
