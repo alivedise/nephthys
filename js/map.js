@@ -1,4 +1,4 @@
-/* -*- Mode: Javascript; tab-width: 2; indent-tabs-mode: nil; js-indent-level: 2; -*- */
+  /* -*- Mode: Javascript; tab-width: 2; indent-tabs-mode: nil; js-indent-level: 2; -*- */
 (function(window) {
   var _start = Date.now();
 
@@ -172,6 +172,7 @@
 
     buildSourceEvents: function() {
       this.currentSourceEvents = {};
+      this.currentSourceEventIds = {};
       if (!this.currentTasks)
         return;
       this.currentTasks.forEach(function iterator(task) {
@@ -182,6 +183,10 @@
           return;
         }
         this.currentSourceEvents[task.sourceEventType].push(task);
+        if (!this.currentSourceEventIds[task.sourceEventId]) {
+          this.currentSourceEventIds[task.sourceEventId] = [];
+        }
+        this.currentSourceEventIds[task.sourceEventId].push(task);
       }, this);
     },
 
@@ -205,6 +210,7 @@
         ids = ids.concat(this.currentProcessThreads[proc]);
       }
 
+      var height = 0;
       for (var idx in ids) {
         var id = ids[idx];
         var thread = new Thread({
@@ -214,14 +220,26 @@
           name: '',
           start: this.start,
           end: this.end,
-          interval: this.interval
+          interval: this.interval,
+          canvas: window.app.threadManager.getCanvas(),
+          width: window.app.threadManager.WIDTH,
+          offsetY: height
+        });
+        height += thread.HEIGHT;
+      }
+
+      for (var type in this.currentSourceEvents) {
+        var sourceEventType = new SourceEventType({
+          type: type,
+          tasks: this.currentSourceEvents[id]
         });
       }
 
-      for (var id in this.currentSourceEvents) {
-        var sourceEventType = new SourceEventType({
-          type: id,
-          tasks: this.currentSourceEvents[id]
+      for (var id in this.currentSourceEventIds) {
+        var sourceEventId = new SourceEventId({
+          id: id,
+          tasks: this.currentSourceEventIds[id],
+          canvas: window.app.threadManager.getCanvas()
         });
       }
     }

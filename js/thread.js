@@ -4,7 +4,11 @@
 (function(exports) {
   var _id = 0;
   var Thread = function(config) {
+    this.instanceID = this.CLASS_NAME + _id;
+    _id++;
     this.config = config;
+    this._canvas = config.canvas;
+    this.WIDTH = config.width;
     this.init();
     Thread[this.instanceID] = this;
     window.broadcaster.emit('-thread-created', this);
@@ -21,7 +25,6 @@
     '-filter-source-event-id': '_filter_source_event_id',
     '-filter-label': '_filter_label',
     '-filter-cleared': 'showAllTasks',
-    'timeline-range-changed': '_timeline_range_changed',
     '-filter-label-toggle': '_filter_label_toggle',
     '-task-id-toggle': '_task_id_toggle'
   };
@@ -29,17 +32,6 @@
   Thread.prototype.containerElement = document.getElementById('timeline');
 
   Thread.prototype.CLASS_NAME = 'thread-';
-
-  Thread.prototype.template = function() {
-    var ColorManager = window.app.colorManager;
-    var bgcolor = ColorManager.getColor(this.config.processId);
-    this.instanceID = this.CLASS_NAME + _id;
-    _id++;
-    return '<div class="thread" id="' + this.instanceID + '">' +
-            '<div class="name"><button class="btn-sm btn btn-default" style="background-color: ' + bgcolor + '; text-shadow: 0 0 3px #fff;">' + (this.config.tasks ? this.config.tasks[0].threadId : '') + ' <span class="glyphicon glyphicon-chevron-up"></span></button></div>' +
-            '<div class="canvas" id="' + this.instanceID + '-canvas"></div>' +
-            '</div>';
-  };
 
   Thread.prototype.createNestedLoopTree = function(tasks) {
     function _createNestedLoopTree(tasks) {
@@ -144,25 +136,13 @@
   };
 
   Thread.prototype.init = function() {
-    this.containerElement.insertAdjacentHTML('beforeend', this.template());
-    this.element = $('#' + this.instanceID);
-    this.elements = {
-      'name': this.element.find('.name > .btn'),
-      'toggle': this.element.find('.name > .btn > span')
-    };
-
     this.placeTasks();
-
-    this.WIDTH = $('#timeline').width() - this._offsetX;
     var num_bags = this.levelStarts[this.levelStarts.length - 1];
     if (num_bags) {
       this.HEIGHT = (num_bags + 1) * (this._intervalH + this._taskHeight);
     } else {
       this.HEIGHT = 500;
     }
-    this._canvas =
-      Raphael(document.getElementById(this.instanceID + '-canvas'),
-        this.WIDTH, this.HEIGHT);
     this.render();
     this.register();
   };
@@ -173,8 +153,6 @@
     }
     this._registered = true;
 
-    this.elements.name.click(this.toggle.bind(this));
-
     // Reconstruct event handler to bind on this.
     for (var e in this.LISTENERS) {
       this[this.LISTENERS[e]] = this[this.LISTENERS[e]].bind(this);
@@ -183,10 +161,6 @@
     for (var e in this.LISTENERS) {
       window.broadcaster.on(e, this[this.LISTENERS[e]]);
     }
-  };
-
-  Thread.prototype._timeline_range_changed = function(x, w) {
-    this._canvas.setViewBox(x, 0, w, this.HEIGHT, true);
   };
 
   Thread.prototype._filter_source_event_ids = function(ids) {
@@ -291,13 +265,6 @@
     this.open();
   };
 
-  Thread.prototype.resize = function(w, h) {
-    this.WIDTH = w;
-    this.HEIGHT = h;
-
-    this._canvas.setSize(this.WIDTH, this.HEIGHT);
-  };
-
   Thread.prototype.toggle = function() {
     if (this.folded) {
       this.open();
@@ -310,13 +277,10 @@
     if (!this.folded) {
       return;
     }
-    this.elements.toggle.toggleClass('glyphicon-chevron-down');
-    this.elements.toggle.toggleClass('glyphicon-chevron-up');
     this.config.tasks.forEach(function(task) {
       task.view.set.show();
       task.view.execution.attr('y', task.y);
     }, this);
-    this._canvas.setSize(this.WIDTH, this.HEIGHT);
     this.folded = false;
   };
 
@@ -324,13 +288,10 @@
     if (this.folded) {
       return;
     }
-    this.elements.toggle.toggleClass('glyphicon-chevron-down');
-    this.elements.toggle.toggleClass('glyphicon-chevron-up');
     this.config.tasks.forEach(function(task) {
       task.view.set.hide();
       task.view.execution.show().attr('y', 0);
     }, this);
-    this._canvas.setSize(this.WIDTH, this._minHeight);
     this.folded = true;
   };
 
@@ -339,8 +300,6 @@
 
   Thread.prototype.destroy = function() {
     this.config = {};
-    this._canvas.remove();
-    this.element.remove();
     for (var e in this.LISTENERS) {
       window.broadcaster.off(e, this[this.LISTENERS[e]]);
     }
@@ -357,13 +316,17 @@
     var tasks = this.config.tasks;
     var ColorManager = window.app.colorManager;
 
-    this._tooltip = this._canvas.rect(0, 0, 150, 30).attr('stroke', 'transparent').attr('fill', 'yellow').hide();
-
     /* Render border */
-    // this._border = this._canvas.rect(0, 0, this.WIDTH, this.HEIGHT).toBack();
+    this._border = this._canvas.rect(0, 0, this.WIDTH, this.HEIGHT).transform('t0,' + this.config.offsetY);
+
+    /* Rende thread name */
+    this._name = this._canvas.text(this.WIDTH - 100, this.HEIGHT / 2, this.config.tasks[0].threadId).transform('t0,' + this.config.offsetY)
+                              .attr('fill', 'silver')
+                              .attr('font-size', this._minHeight)
+                              .toBack();
 
     /* Render semitransparent overlay */
-    this._overlay = this._canvas.rect(0, 0, this.WIDTH, this.HEIGHT)
+    this._overlay = this._canvas.rect(0, 0, this.WIDTH, this.HEIGHT).transform('t0,' + this.config.offsetY)
       .toBack()
       .attr('opacity', 0.9)
       .attr('fill', 'white')
@@ -377,31 +340,6 @@
         }.bind(this));
       }(task));
     }, this);
-
-    /** Trigger tooltip for tasks */
-    this.element.mousemove(function(evt) {
-      var x = evt.pageX;
-      var y = evt.pageY;
-      var ele = this._canvas.getElementByPoint(x, y);
-      if (ele && ele.data('task')) {
-        console.log(ele.getBBox());
-        window.broadcaster.emit('-task-hovered', ele.data('task'), x, y);
-      } else {
-        window.broadcaster.emit('-task-out');
-      }
-    }.bind(this));
-
-    /** Focus the element to show the connections */
-    this.element.click(function(evt) {
-      var x = evt.pageX;
-      var y = evt.pageY;
-      var ele = this._canvas.getElementByPoint(x, y);
-      if (ele && ele.data('task')) {
-        window.broadcaster.emit('-task-focused', ele.data('task'), x, y);
-      } else {
-        window.broadcaster.emit('-task-out');
-      }
-    }.bind(this));
 
     /* Render separators of levels of nested event loops */
     if (this.levelStarts.length >= 3) {
@@ -482,8 +420,9 @@
     }
 
     var set = this._canvas.setFinish();
-    task.y = y;
+    task.y = y + this.config.offsetY;
     task.x = lx;
+    task.h = this._taskHeight;
     task.view = {
       latency: latency,
       execution: execution,
@@ -491,6 +430,7 @@
       set: set
     };
     task.rendered = true;
+    set.transform('t0,' + this.config.offsetY);
 
     window.broadcaster.emit('-task-rendered', task, ex, ew, task.threadId);
   };

@@ -14,6 +14,7 @@
       this.timeline = new Timeline();
       this.tooltip = new Tooltip();
       this.taskManager = new TaskManager(this);
+      this.threadManager = new ThreadManager(this);
       this.register();
     },
     _threads: [],

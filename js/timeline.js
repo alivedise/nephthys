@@ -20,7 +20,7 @@
     }
     this._rendered = true;
 
-    this.WIDTH = $('#timeline').width() - 75;
+    this.WIDTH = this.element.width();
     this.range = this._canvas.rect(0, 0, this.WIDTH, this.HEIGHT)
                       .attr('stroke', 'transparent')
                       .attr('opacity', 0.33)

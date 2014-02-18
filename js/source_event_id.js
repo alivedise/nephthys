@@ -1,42 +1,57 @@
 (function(exports) {
-  var SourceEventID = function(config) {
+  var SourceEventId = function(config) {
     this.config = config;
-    this.type = config.type;
     this.id = config.id;
+    this._canvas = this.config.canvas;
     this.init();
-    SourceEventID[this.id] = this;
+    SourceEventId[this.id] = this;
     this.handleIdToggled = this.handleIdToggled.bind(this);
-    window.broadcaster.on('-source-event-id-*-toggled', this.handleIdToggled)
+    window.broadcaster.on('-source-event-id-filtered', this.handleIdToggled);
     window.broadcaster.emit('-source-event-id-created');
   };
-  SourceEventID.prototype = new EventEmitter();
-  SourceEventID.prototype.constructor = SourceEventID;
-  SourceEventID.prototype.init = function() {
+  SourceEventId.prototype = new EventEmitter();
+  SourceEventId.prototype.constructor = SourceEventId;
+  SourceEventId.prototype.init = function() {
   };
 
-
-  SourceEventID.prototype.buildConnections = function() {
+  SourceEventId.prototype.buildConnections = function() {
     this.config.tasks.forEach(function(task) {
       if (task.parentTask) {
       }
     }, this);
   };
 
-  SourceEventID.prototype.handleIdToggled = function() {
-    console.log(arguments);
+  SourceEventId.prototype.handleIdToggled = function(id) {
+    if (String(id) !== String(this.id)) {
+      return;
+    }
+    this.config.tasks.forEach(function(task) {
+      if (task.parentTask) {
+        var parent = task.parentTask;
+        var upper = true;
+        if (task.y > parent.y) {
+          upper = false;
+        }
+        this._canvas.arrow(task.x,
+                            upper ? task.y : task.y + task.h,
+                            task.x,
+                            upper ? parent.y - task.h : parent.y,
+                            1, 'black');
+      }
+    }, this);
   };
 
-  SourceEventID.prototype.show = function() {
+  SourceEventId.prototype.show = function() {
   };
 
-  SourceEventID.prototype.hide = function() {
+  SourceEventId.prototype.hide = function() {
   };
 
-  SourceEventID.prototype.destroy = function() {
-    delete SourceEventID[this.id];
+  SourceEventId.prototype.destroy = function() {
+    delete SourceEventId[this.id];
     window.broadcaster.off('-source-event-id-*-toggled', this.handleIdToggled)
     window.broadcaster.emit('-source-event-id-destoryed', this);
   };
 
-  exports.SourceEventType = SourceEventID;
+  exports.SourceEventId = SourceEventId;
 }(this));

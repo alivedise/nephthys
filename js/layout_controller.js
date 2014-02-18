@@ -22,7 +22,7 @@
         , spacing_closed:     0 // ALL panes
           // MIDDLE-LAYOUT (child of outer-center-pane)
         , center__childOptions: {
-            center__paneSelector: "#timeline"
+            center__paneSelector: "#mapContainer"
           , center__onresize: function() {
               self.publish('ui-resize');
             }
