@@ -448,7 +448,7 @@
 
     /** Render latency **/
     var width = (lw + ew) > this._taskMinWidth ? (lw + ew) : this._taskMinWidth;
-    var latency = this._canvas.rect(lx, y, lw, h)
+    var latency = this._canvas.rect(lx, y + h / 4, lw, h / 2)
                               .attr('fill', c)
                               .attr('opacity', 0.5)
                               .attr('stroke-width', 0)
