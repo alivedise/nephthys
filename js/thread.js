@@ -370,13 +370,21 @@
       .hide();
 
     /* Render tasks */
-    this.config.tasks.forEach(function(task) {
-      (function(t) {
-        setTimeout(function() {
-          self.render_task(t, ColorManager.getColor(task.sourceEventId));
-        }.bind(this));
-      }(task));
-    }, this);
+    function create_runner(tasks) {
+      function _runner() {
+        tasks.forEach(function(task) {
+          self.render_task(task, ColorManager.getColor(task.sourceEventId));
+        });
+      }
+      return _runner;
+    }
+
+    var run_size = 200;
+    for (var i = 0; i < this.config.tasks.length; i += run_size) {
+      var render_content = this.config.tasks.slice(i, i + run_size);
+      window.broadcaster.emit('-friendly-runner',
+                              create_runner(render_content));
+    }
 
     /** Trigger tooltip for tasks */
     this.element.mousemove(function(evt) {
@@ -405,7 +413,7 @@
 
     /* Render separators of levels of nested event loops */
     if (this.levelStarts.length >= 3) {
-      var separators = this.levelStarts.splice(1, this.levelStarts.length - 2);
+      var separators = this.levelStarts.slice(1, -1);
       separators.forEach(function(separator) {
         var y = (separator - 1) * (self._taskHeight + self._intervalH) +
           self._taskHeight / 2;
