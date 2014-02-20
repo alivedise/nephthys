@@ -120,7 +120,7 @@
     parse: function Isis_parse(string) {
       this.clear(true);
       var object = JSON.parse(string);
-      this.start = object.start;
+      this.start = object.start || object.begin;
       // XXX: fix me
       this.end = object.end;
       this.interval = this.end - this.start;

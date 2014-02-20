@@ -434,6 +434,9 @@
 
   Thread.prototype.render_task = function(task, sourceEventColor) {
     // No dispatch time!
+    if (!task.start && task.begin) {
+      task.start = task.begin;
+    }
     if (task.dispatch === 0 && task.start !== 0) {
       task.dispatch = task.start;
     }
