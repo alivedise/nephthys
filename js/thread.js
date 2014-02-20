@@ -460,12 +460,6 @@
                                 .attr('stroke-width', 0)
                                 .data('task', task);
 
-    /** Render life span **/
-    var life = this._canvas.path("M" + lx + " " + (y + h / 2) + " l" + lw + " 0")
-                           .attr('stroke-width', 1)
-                           .attr('stroke', c)
-                           .data('task', task);
-
     /** Render label **/
     /**
     var id;
@@ -495,7 +489,6 @@
     task.view = {
       latency: latency,
       execution: execution,
-      life: life,
       set: set
     };
     task.rendered = true;
