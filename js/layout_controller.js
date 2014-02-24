@@ -28,6 +28,8 @@
             }
           , north__paneSelector:   "#ui-top"
           , north__size:      40
+          , south__paneSelector:   "#ui-bottom"
+          , south__size:      40
           , spacing_open:     0  // ALL panes
           , spacing_closed:     0 // ALL panes
 

@@ -1,5 +1,6 @@
 (function(exports) {
-  var Timeline = function() {
+  var Timeline = function(app) {
+    this.app = app;
     this.init();
   };
 

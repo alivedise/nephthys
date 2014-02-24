@@ -127,11 +127,8 @@
       var self = this;
       if (Array.isArray(object.tasks)) {
         this.currentTasks = object.tasks;
-      } else {
-        this.currentTasks = [];
-        for (var taskid in object.tasks) {
-          this.currentTasks.push(object.tasks[taskid]);
-        }
+        this._currentThreads = object.threads;
+        window.app.processManager.update(object);
       }
 
       this.buildThreads();
@@ -211,7 +208,7 @@
           id: id,
           tasks: this.currentThreads[id],
           processId: this.currentThreads[id][0].processId,
-          name: '',
+          name: this.getThreadName(id),
           start: this.start,
           end: this.end,
           interval: this.interval
@@ -224,6 +221,19 @@
           tasks: this.currentSourceEvents[id]
         });
       }
+    },
+    getThreadName: function(id) {
+      var name = '';
+      if (this._currentThreads) {
+        this._currentThreads.some(function(thread) {
+          console.log(id, thread);
+          if (Number(thread.threadId) === Number(id)) {
+            name = thread.threadName;
+            return true;
+          }
+        }, this)
+      }
+      return name;
     }
   };
   Isis.init();

@@ -5,6 +5,13 @@ textarea {
   display: none;
 }
 
+#process-mapping {
+  margin: 5px;
+}
+#process-mapping > span {
+  margin: 5px;
+}
+
 #isis-tooltip {
   position: absolute;
   z-index: 2048;
