@@ -13,6 +13,7 @@
   Tooltip.prototype.template = function() {
     return '<div class="alert alert-info isis-tooltip" id="isis-tooltip">' +
               '<div><input type="checkbox" name="tooltip-source-event-id" value="" /></button><label>Show relavant tasks only.</label></div>' +
+              '<div><span>Name</span><span class="name label label-default pull-right"></span></div>' +
               '<div><span>TaskID</span><span class="taskId label label-default pull-right"></span></div>' +
               '<div><span>SourceEventType</span><span class="sourceEventType label label-default pull-right"></span></div>' +
               '<div><span>SourceEventID</span><span class="label label-default pull-right"><span class="colorSample">█ </span><span class="sourceEventId"></span></span></div>' +
@@ -54,6 +55,7 @@
       }
       this.element.find('.labels').remove();
       this.element.find('.taskId').text(task.taskId);
+      this.element.find('.name').text(task.name);
       this.element.find('.sourceEventId').text(task.sourceEventId);
       this.element.find('.sourceEventType').text(task.sourceEventType);
       this.element.find('.execution').text(task.end - task.start);
