@@ -39,6 +39,11 @@
       this.render_range();
     }.bind(this));
 
+    window.broadcaster.on('range-created', function(start, interval) {
+      this.start = start;
+      this.interval = interval;
+    }.bind(this));
+
     this._miniThreads = {};
     this._miniThreadsCount = 1;
     window.broadcaster.on('-task-rendered', function(task, x, w, tid) {
@@ -76,9 +81,14 @@
       return;
     }
     this._start = 0;
+    var x = this.range.attr('x');
+    var w = this.range.attr('width');
     self.window.broadcaster.emit('timeline-range-changed',
-      this.range.attr('x'),
-      this.range.attr('width'));
+      x,
+      w,
+      this.start + this.interval * x / this.WIDTH,
+      this.interval * w / this.WIDTH
+      );
   };
   exports.Timeline = Timeline;
 }(this));

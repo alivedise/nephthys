@@ -124,6 +124,7 @@
       // XXX: fix me
       this.end = object.end;
       this.interval = this.end - this.start;
+      window.broadcaster.emit('range-created', this.start, this.interval);
       var self = this;
       if (Array.isArray(object.tasks)) {
         this.currentTasks = object.tasks;

@@ -165,6 +165,7 @@
         this.WIDTH, this.HEIGHT);
     this.render();
     this.register();
+    this._registerMouseEvents();
   };
 
   Thread.prototype.register = function() {
@@ -185,8 +186,11 @@
     }
   };
 
-  Thread.prototype._timeline_range_changed = function(x, w) {
-    this._canvas.setViewBox(x, 0, w, this.HEIGHT, true);
+  Thread.prototype._timeline_range_changed = function(x, w, start, interval) {
+    //this._canvas.setViewBox(x, 0, w, this.HEIGHT, true);
+    this.config.start = start;
+    this.config.interval = interval;
+    this.repositionTasks();
   };
 
   Thread.prototype._filter_source_event_ids = function(ids) {
@@ -353,15 +357,6 @@
     }
     this._rendered = true;
 
-    var self = this;
-    var tasks = this.config.tasks;
-    var ColorManager = window.app.colorManager;
-
-    this._tooltip = this._canvas.rect(0, 0, 150, 30).attr('stroke', 'transparent').attr('fill', 'yellow').hide();
-
-    /* Render border */
-    // this._border = this._canvas.rect(0, 0, this.WIDTH, this.HEIGHT).toBack();
-
     /* Render semitransparent overlay */
     this._overlay = this._canvas.rect(0, 0, this.WIDTH, this.HEIGHT)
       .toBack()
@@ -369,7 +364,27 @@
       .attr('fill', 'white')
       .hide();
 
+    this.renderTasks();
+
+    /* Render separators of levels of nested event loops */
+    if (this.levelStarts.length >= 3) {
+      var separators = this.levelStarts.slice(1, -1);
+      separators.forEach(function(separator) {
+        var y = (separator - 1) * (this._taskHeight + this._intervalH) +
+          this._taskHeight / 2;
+        var g = this._canvas.path('M 0 ' + y + ' l ' + this.WIDTH + ' 0')
+          .attr('fill', 'none')
+          .attr('stroke-width', 0.1)
+          .attr('stroke', 'green');
+      }, this);
+    }
+  };
+  Thread.prototype.renderTasks = function() {
     /* Render tasks */
+
+    var self = this;
+    var tasks = this.config.tasks;
+    var ColorManager = window.app.colorManager;
     function create_runner(tasks) {
       function _runner() {
         tasks.forEach(function(task) {
@@ -385,14 +400,19 @@
       window.broadcaster.emit('-friendly-runner',
                               create_runner(render_content));
     }
+  };
 
+  Thread.prototype._registerMouseEvents = function() {
+    if (this._mouseEventRegistered) {
+      return;
+    }
+    this._mouseEventRegistered = true;
     /** Trigger tooltip for tasks */
     this.element.mousemove(function(evt) {
       var x = evt.pageX;
       var y = evt.pageY;
       var ele = this._canvas.getElementByPoint(x, y);
       if (ele && ele.data('task')) {
-        console.log(ele.getBBox());
         window.broadcaster.emit('-task-hovered', ele.data('task'), x, y);
       } else {
         window.broadcaster.emit('-task-out');
@@ -410,19 +430,6 @@
         window.broadcaster.emit('-task-out');
       }
     }.bind(this));
-
-    /* Render separators of levels of nested event loops */
-    if (this.levelStarts.length >= 3) {
-      var separators = this.levelStarts.slice(1, -1);
-      separators.forEach(function(separator) {
-        var y = (separator - 1) * (self._taskHeight + self._intervalH) +
-          self._taskHeight / 2;
-        var g = self._canvas.path('M 0 ' + y + ' l ' + self.WIDTH + ' 0')
-          .attr('fill', 'none')
-          .attr('stroke-width', 0.1)
-          .attr('stroke', 'green');
-      });
-    }
   };
 
   Thread.prototype._offsetX = 150;
@@ -463,25 +470,15 @@
                                 .attr('stroke-width', 0)
                                 .data('task', task);
 
-    /** Render label **/
-    /**
-    var id;
-
-    id = this._canvas.text(lx + 5, y + this._taskHeight / 2, (task.taskId))
-                      .attr('text-anchor', 'start')
-                      .attr('color', '#ffffff')
-                      .attr('font-size', 15).attr('fill', sourceEventColor)
-                      .hide(); // hide by default
-    id.attr('x', id.getBBox().x - id.getBBox().width - 10);
-    **/
+    var circles = [];
 
     /** Render labels **/
     if (task.labels) {
       task.labels.forEach(function(label) {
         var x = this.WIDTH * (label.timestamp - this.config.start) / this.config.interval;
-        this._canvas.circle(x, y + this._taskHeight / 2, 1)
+        circles.push(this._canvas.circle(x, y + this._taskHeight / 2, 1)
                     .attr('fill', 'red')
-                    .attr('stroke', 'transparent');
+                    .attr('stroke', 'transparent').data('timestamp', label.timestamp));
         window.broadcaster.emit('-label-rendered', label.label);
       }, this);
     }
@@ -492,11 +489,28 @@
     task.view = {
       latency: latency,
       execution: execution,
+      circles: circles,
       set: set
     };
     task.rendered = true;
 
     window.broadcaster.emit('-task-rendered', task, ex, ew, task.threadId);
+  };
+
+  Thread.prototype.repositionTasks = function() {
+    this.config.tasks.forEach(function(task) {
+      var set = task.set;
+      var lx = this.WIDTH * (task.dispatch - this.config.start) / this.config.interval;
+      var ex = this.WIDTH * (task.start - this.config.start) / this.config.interval;
+      var lw = (this.WIDTH) * (task.start - task.dispatch) / this.config.interval;
+      var ew = (this.WIDTH) * (task.end - task.start) / this.config.interval;
+      task.view.latency.attr('x', lx).attr('width', lw);
+      task.view.execution.attr('x', ex).attr('width', ew);
+      task.view.circles.forEach(function(circle) {
+        var x = this.WIDTH * (circle.data('timestamp') - this.config.start) / this.config.interval;
+        circle.attr('x', x);
+      }, this);
+    }, this);
   };
 
   Thread.prototype.highlight = function(element) {
