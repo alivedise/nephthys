@@ -508,7 +508,7 @@
       task.view.execution.attr('x', ex).attr('width', ew);
       task.view.circles.forEach(function(circle) {
         var x = this.WIDTH * (circle.data('timestamp') - this.config.start) / this.config.interval;
-        circle.attr('x', x);
+        circle.attr('cx', x);
       }, this);
     }, this);
   };
