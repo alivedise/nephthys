@@ -144,6 +144,8 @@
   };
 
   Thread.prototype.init = function() {
+    this.config.translate = 0;
+    this.config.scale = 1;
     this.containerElement.insertAdjacentHTML('beforeend', this.template());
     this.element = $('#' + this.instanceID);
     this.elements = {
@@ -187,9 +189,13 @@
   };
 
   Thread.prototype._timeline_range_changed = function(x, w, start, interval) {
-    //this._canvas.setViewBox(x, 0, w, this.HEIGHT, true);
-    this.config.start = start;
-    this.config.interval = interval;
+    if (interval <= 0 || start < this.config.start) {
+      this.config.translate = 0;
+      this.config.scale = 1;
+    } else {
+      this.config.translate = start - this.config.start;
+      this.config.scale = this.config.interval / interval;
+    }
     this.repositionTasks();
   };
 
@@ -498,16 +504,18 @@
   };
 
   Thread.prototype.repositionTasks = function() {
+    var start = this.config.start + this.config.translate;
+    var interval = this.config.interval / this.config.scale;
     this.config.tasks.forEach(function(task) {
       var set = task.set;
-      var lx = this.WIDTH * (task.dispatch - this.config.start) / this.config.interval;
-      var ex = this.WIDTH * (task.start - this.config.start) / this.config.interval;
-      var lw = (this.WIDTH) * (task.start - task.dispatch) / this.config.interval;
-      var ew = (this.WIDTH) * (task.end - task.start) / this.config.interval;
+      var lx = this.WIDTH * (task.dispatch - start) / interval;
+      var ex = this.WIDTH * (task.start - start) / interval;
+      var lw = (this.WIDTH) * (task.start - task.dispatch) / interval;
+      var ew = (this.WIDTH) * (task.end - task.start) / interval;
       task.view.latency.attr('x', lx).attr('width', lw);
       task.view.execution.attr('x', ex).attr('width', ew);
       task.view.circles.forEach(function(circle) {
-        var x = this.WIDTH * (circle.data('timestamp') - this.config.start) / this.config.interval;
+        var x = this.WIDTH * (circle.data('timestamp') - start) / interval;
         circle.attr('cx', x);
       }, this);
     }, this);
