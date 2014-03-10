@@ -34,7 +34,7 @@
         , spacing_closed:     1 // ALL panes
         // MIDDLE-LAYOUT (child of outer-center-pane)
         , center__childOptions: {
-            center__paneSelector: "#timeline"
+            center__paneSelector: "#canvas"
           , center__onresize: function() {
               self.publish('ui-resize');
             }

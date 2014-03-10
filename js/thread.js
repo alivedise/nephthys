@@ -6,6 +6,7 @@
   var Thread = function(config) {
     this.config = config;
     this.init();
+    this.instanceID = this.CLASS_NAME + _id++;
     Thread[this.instanceID] = this;
     window.broadcaster.emit('-thread-created', this);
   };
@@ -26,20 +27,7 @@
     '-task-id-toggle': '_task_id_toggle'
   };
 
-  Thread.prototype.containerElement = document.getElementById('timeline');
-
   Thread.prototype.CLASS_NAME = 'thread-';
-
-  Thread.prototype.template = function() {
-    var ColorManager = window.app.colorManager;
-    var bgcolor = ColorManager.getColor(this.config.processId);
-    this.instanceID = this.CLASS_NAME + _id;
-    _id++;
-    return '<div class="thread" id="' + this.instanceID + '">' +
-            '<div class="name"><button class="btn-sm btn btn-default" style="background-color: ' + bgcolor + '; text-shadow: 0 0 3px #fff;">' + (this.config.name || (this.config.tasks ? this.config.tasks[0].threadId : '')) + ' <span class="glyphicon glyphicon-chevron-up"></span></button></div>' +
-            '<div class="canvas" id="' + this.instanceID + '-canvas"></div>' +
-            '</div>';
-  };
 
   Thread.prototype.createNestedLoopTree = function(tasks) {
     function _createNestedLoopTree(tasks) {
@@ -143,28 +131,26 @@
     });
   };
 
+  Thread.prototype.containerElement = $('#canvas');
+
   Thread.prototype.init = function() {
+    if (this._inited) {
+      return;
+    }
+    this._inited = true;
     this.config.translate = 0;
     this.config.scale = 1;
-    this.containerElement.insertAdjacentHTML('beforeend', this.template());
-    this.element = $('#' + this.instanceID);
-    this.elements = {
-      'name': this.element.find('.name > .btn'),
-      'toggle': this.element.find('.name > .btn > span')
-    };
 
     this.placeTasks();
 
-    this.WIDTH = $('#timeline').width() - this._offsetX;
+    this.WIDTH = this.containerElement.width();
     var num_bags = this.levelStarts[this.levelStarts.length - 1];
     if (num_bags) {
       this.HEIGHT = (num_bags + 1) * (this._intervalH + this._taskHeight);
     } else {
       this.HEIGHT = 500;
     }
-    this._canvas =
-      Raphael(document.getElementById(this.instanceID + '-canvas'),
-        this.WIDTH, this.HEIGHT);
+    this._canvas = this.config.canvas;
     this.render();
     this.register();
     this._registerMouseEvents();
@@ -175,8 +161,6 @@
       return;
     }
     this._registered = true;
-
-    this.elements.name.click(this.toggle.bind(this));
 
     // Reconstruct event handler to bind on this.
     for (var e in this.LISTENERS) {
@@ -189,12 +173,12 @@
   };
 
   Thread.prototype._timeline_range_changed = function(x, w, start, interval) {
-    if (interval <= 0 || start < this.config.start) {
+    if (start < this.config.start) {
       this.config.translate = 0;
       this.config.scale = 1;
     } else {
       this.config.translate = start - this.config.start;
-      this.config.scale = this.config.interval / interval;
+      this.config.scale = this.WIDTH / w;
     }
     this.repositionTasks();
   };
@@ -303,9 +287,6 @@
 
   Thread.prototype.resize = function(w, h) {
     this.WIDTH = w;
-    this.HEIGHT = h;
-
-    this._canvas.setSize(this.WIDTH, this.HEIGHT);
   };
 
   Thread.prototype.toggle = function() {
@@ -320,13 +301,10 @@
     if (!this.folded) {
       return;
     }
-    this.elements.toggle.toggleClass('glyphicon-chevron-down');
-    this.elements.toggle.toggleClass('glyphicon-chevron-up');
     this.config.tasks.forEach(function(task) {
       task.view.set.show();
       task.view.execution.attr('y', task.y);
     }, this);
-    this._canvas.setSize(this.WIDTH, this.HEIGHT);
     this.folded = false;
   };
 
@@ -334,13 +312,10 @@
     if (this.folded) {
       return;
     }
-    this.elements.toggle.toggleClass('glyphicon-chevron-down');
-    this.elements.toggle.toggleClass('glyphicon-chevron-up');
     this.config.tasks.forEach(function(task) {
       task.view.set.hide();
       task.view.execution.show().attr('y', 0);
     }, this);
-    this._canvas.setSize(this.WIDTH, this._minHeight);
     this.folded = true;
   };
 
@@ -349,8 +324,6 @@
 
   Thread.prototype.destroy = function() {
     this.config = {};
-    this._canvas.remove();
-    this.element.remove();
     for (var e in this.LISTENERS) {
       window.broadcaster.off(e, this[this.LISTENERS[e]]);
     }
@@ -370,7 +343,19 @@
       .attr('fill', 'white')
       .hide();
 
+    /* Render border */
+    this._border = this._canvas.rect(0, this.config.offsetY, this.WIDTH, this.HEIGHT)
+      .toBack()
+      .attr('opacity', 0.9)
+      .attr('stroke', 'grey');
+
     this.renderTasks();
+
+    this._name = this._canvas.text(0, this.HEIGHT / 2 + (this.config.offsetY),
+      this.config.name || (this.config.tasks ? this.config.tasks[0].threadId : ''));
+    this._name.attr('font-size', '20')
+              .attr('fill', window.app.colorManager.getColor(this.config.processId))
+              .attr('x', this.WIDTH / 2);
 
     /* Render separators of levels of nested event loops */
     if (this.levelStarts.length >= 3) {
@@ -413,33 +398,8 @@
       return;
     }
     this._mouseEventRegistered = true;
-    /** Trigger tooltip for tasks */
-    this.element.mousemove(function(evt) {
-      var x = evt.pageX;
-      var y = evt.pageY;
-      var ele = this._canvas.getElementByPoint(x, y);
-      if (ele && ele.data('task')) {
-        window.broadcaster.emit('-task-hovered', ele.data('task'), x, y);
-      } else {
-        window.broadcaster.emit('-task-out');
-      }
-    }.bind(this));
-
-    /** Focus the element to show the connections */
-    this.element.click(function(evt) {
-      var x = evt.pageX;
-      var y = evt.pageY;
-      var ele = this._canvas.getElementByPoint(x, y);
-      if (ele && ele.data('task')) {
-        window.broadcaster.emit('-task-focused', ele.data('task'), x, y);
-      } else {
-        window.broadcaster.emit('-task-out');
-      }
-    }.bind(this));
   };
 
-  Thread.prototype._offsetX = 150;
-  Thread.prototype._offsetY = 0;
   Thread.prototype._taskHeight = 10;
   Thread.prototype._intervalH = 5;
   Thread.prototype._taskMinWidth = 1;
@@ -490,8 +450,10 @@
     }
 
     var set = this._canvas.setFinish();
+    set.transform('t0,' + this.config.offsetY);
     task.y = y;
     task.x = lx;
+    task.offsetY = this.config.offsetY;
     task.view = {
       latency: latency,
       execution: execution,
@@ -507,7 +469,6 @@
     var start = this.config.start + this.config.translate;
     var interval = this.config.interval / this.config.scale;
     this.config.tasks.forEach(function(task) {
-      var set = task.set;
       var lx = this.WIDTH * (task.dispatch - start) / interval;
       var ex = this.WIDTH * (task.start - start) / interval;
       var lw = (this.WIDTH) * (task.start - task.dispatch) / interval;

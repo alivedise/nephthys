@@ -14,6 +14,7 @@
       this.timeline = new Timeline();
       this.tooltip = new Tooltip(this);
       this.taskManager = new TaskManager(this);
+      this.threadManager = new ThreadManager(this);
       this.processManager = new ProcessManager(this);
       this.progress = new Progress(this);
       this.register();

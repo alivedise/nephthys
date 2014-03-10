@@ -94,7 +94,6 @@
   Tooltip.prototype.MAX_HEIGHT = 400;
 
   Tooltip.prototype.getProperLayout = function(x, y, w, h) {
-    console.log(x, y, w, h);
     var MAX_W = Math.abs(window.innerWidth - x);
     var MAX_H = Math.abs(window.innerHeight - y);
     var W = Math.max(this.MAX_WIDTH, w);

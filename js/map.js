@@ -170,17 +170,19 @@
     },
 
     buildSourceEvents: function() {
-      this.currentSourceEvents = {};
+      this.currentSourceEventTypes = {};
+      this.currentSourceEventIds = {};
       if (!this.currentTasks)
         return;
       this.currentTasks.forEach(function iterator(task) {
-        if (!this.currentSourceEvents[task.sourceEventType]) {
-          this.currentSourceEvents[task.sourceEventType] = [];
+        if (!this.currentSourceEventTypes[task.sourceEventType]) {
+          this.currentSourceEventTypes[task.sourceEventType] = [];
         }
-        if (task.sourceEventId === null) {
-          return;
+        this.currentSourceEventTypes[task.sourceEventType].push(task);
+        if (!this.currentSourceEventIds[task.sourceEventId]) {
+          this.currentSourceEventIds[task.sourceEventId] = [];
         }
-        this.currentSourceEvents[task.sourceEventType].push(task);
+        this.currentSourceEventIds[task.sourceEventId].push(task);
       }, this);
     },
 
@@ -204,6 +206,7 @@
         ids = ids.concat(this.currentProcessThreads[proc]);
       }
 
+      var accumulatedOffsetY = 0;
       for (var idx in ids) {
         var id = ids[idx];
         var thread = new Thread({
@@ -213,14 +216,24 @@
           name: this.getThreadName(id),
           start: this.start,
           end: this.end,
-          interval: this.interval
+          interval: this.end - this.start,
+          canvas: window.app.threadManager.getCanvas(),
+          offsetY: accumulatedOffsetY
+        });
+        accumulatedOffsetY += thread.HEIGHT;
+      }
+
+      for (var id in this.currentSourceEventTypes) {
+        var sourceEventType = new SourceEventType({
+          type: id,
+          tasks: this.currentSourceEventTypes[id]
         });
       }
 
-      for (var id in this.currentSourceEvents) {
-        var sourceEventType = new SourceEventType({
-          type: id,
-          tasks: this.currentSourceEvents[id]
+      for (var id in this.currentSourceEventIds) {
+        var sourceEventId = new SourceEventID({
+          id: id,
+          tasks: this.currentSourceEventIds[id]
         });
       }
     },
