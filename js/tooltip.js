@@ -4,7 +4,8 @@
    * Tooltip for task.
    * @requires Filter
    */
-  var Tooltip = function() {
+  var Tooltip = function(app) {
+    this.app = app;
     this.init();
   };
   Tooltip.prototype = new EventEmitter();
@@ -79,12 +80,56 @@
           this.element.find('.labels').append('<div><span class="label label-info">'+label.timestamp+'</span><span>'+label.label+'</span></div>')
         }, this);
       }
-      this.element.show().css({ left: x, top: y });
+      this.element.width('auto').height('auto').show();
+      var position = this.getProperLayout(x, y, this.element[0].clientWidth, this.element[0].clientHeight);
+      this.element.show().css(position);
     }.bind(this));
     window.broadcaster.on('-task-out', function(task, x, y) {
       this.element.find('.taskId').text("");
       this.element.hide();
     }.bind(this));
+  };
+
+  Tooltip.prototype.MAX_WIDTH = 250;
+  Tooltip.prototype.MAX_HEIGHT = 400;
+
+  Tooltip.prototype.getProperLayout = function(x, y, w, h) {
+    console.log(x, y, w, h);
+    var MAX_W = Math.abs(window.innerWidth - x);
+    var MAX_H = Math.abs(window.innerHeight - y);
+    var W = Math.max(this.MAX_WIDTH, w);
+    W = Math.min(MAX_W, W);
+    var H = Math.max(this.MAX_HEIGHT, h);
+    H = Math.min(MAX_H, H);
+    if (window.innerWidth > x * 2 && window.innerHeight > y * 2) {
+      return {
+        left: x,
+        top: y,
+        width: W,
+        height: H
+      };
+    } else if (window.innerWidth > x * 2 && window.innerHeight < y * 2) {
+      return {
+        left: x,
+        top: y - H,
+        width: W,
+        height: H
+      };
+    } else if (window.innerWidth < x * 2 && window.innerHeight < y * 2) {
+      return {
+        left: x - W,
+        top: y - H,
+        width: W,
+        height: H
+      };
+    } else {
+      return {
+        left: x - W,
+        top: y,
+        width: W,
+        height: H
+      };
+    }
   };
 
   exports.Tooltip = Tooltip;

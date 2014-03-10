@@ -12,11 +12,25 @@ textarea {
   margin: 5px;
 }
 
+#header {
+  z-index: 999; 
+}
+
+#progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  margin-bottom: 0px;
+}
+
 #isis-tooltip {
   position: absolute;
   z-index: 2048;
   display: none;
   min-width: 250px;
+  overflow-y: auto;
 }
 
 #isis-tooltip > div {

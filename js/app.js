@@ -12,9 +12,10 @@
       this.colorManager = new ColorManager();
       this.broadcaster = window.broadcaster;
       this.timeline = new Timeline();
-      this.tooltip = new Tooltip();
+      this.tooltip = new Tooltip(this);
       this.taskManager = new TaskManager(this);
       this.processManager = new ProcessManager(this);
+      this.progress = new Progress(this);
       this.register();
     },
     _threads: [],

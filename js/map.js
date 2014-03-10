@@ -131,6 +131,7 @@
         this._currentThreads = object.threads;
         window.app.processManager.update(object);
       }
+      window.broadcaster.emit('tasks-initing', this.currentTasks);
 
       this.buildThreads();
       this.buildSourceEvents();
