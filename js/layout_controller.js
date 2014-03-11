@@ -11,7 +11,7 @@
       window.dispatchEvent(new CustomEvent(event, { detail: detail }));
     },
     layout: {
-      filter: 250,
+      filter: 0,
       header: 50,
       timeline: 40,
       info: 40
@@ -26,9 +26,7 @@
       var self = this;
       this._layout = $('body').layout({
         center__paneSelector: ".layout-center"
-        , west__paneSelector:   ".layout-west"
         , north__paneSelector:   ".layout-north"
-        , west__size:       this.layout.filter
         , north__size:       this.layout.header
         , spacing_open:     1  // ALL panes
         , spacing_closed:     1 // ALL panes

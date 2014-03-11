@@ -1,8 +1,27 @@
+body {
+  position: relative;
+}
+
 textarea {
   background-color: grey;
   color: silver;
   width: 100%;
   display: none;
+}
+
+#filter {
+  position: absolute;
+  bottom: 65px;
+  left: 5px;
+  z-index: 99999;
+}
+
+#filterToolbar {
+  position: absolute;
+  bottom: 50px;
+  left: 5px;
+  z-index: 99999;
+  cursor: pointer;
 }
 
 #process-mapping {

@@ -25,6 +25,7 @@
       if (!this._canvas) {
         return;
       }
+      window.broadcaster.emit('canvas-focused');
       var x = evt.pageX;
       var y = evt.pageY;
       var ele = this._canvas.getElementByPoint(x, y);
