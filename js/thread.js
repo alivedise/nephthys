@@ -25,7 +25,8 @@
     '-filter-cleared': 'showAllTasks',
     'timeline-range-changed': '_timeline_range_changed',
     '-filter-label-toggle': '_filter_label_toggle',
-    '-task-id-toggle': '_task_id_toggle'
+    '-task-id-toggle': '_task_id_toggle',
+    '-thread-manager-zoom-in': '_thread_manager_zoom_in'
   };
 
   Thread.prototype.CLASS_NAME = 'thread-';
@@ -181,6 +182,13 @@
       this.config.translate = start - this.config.start;
       this.config.scale = this.WIDTH / w;
     }
+    this.repositionTasks();
+  };
+
+  Thread.prototype._thread_manager_zoom_in = function(x, y, w, h) {
+    console.log(x, y, w, h, this.config.translate, this.config.scale);
+    this.config.translate = this.config.translate + this.config.scale * x;
+    this.config.scale = this.config.scale * 2;
     this.repositionTasks();
   };
 

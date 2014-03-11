@@ -50,10 +50,7 @@
         window.broadcaster.emit('-task-out');
         return;
       }
-      if (ele.data('task')) {
-        window.broadcaster.emit('-task-focused', ele.data('task'), x, y);
-      } else if (ele.data('thread')) {
-      }
+      window.broadcaster.emit('-thread-manager-zoom-in', x, y, this.WIDTH, this.HEIGHT);
     }.bind(this));
   };
   ThreadManager.prototype = new EventEmitter();
