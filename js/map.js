@@ -101,7 +101,6 @@
     },
 
     resize: function Isis_resize(event) {
-      this.render();
     },
 
     clear: function Isis_clear(resetColor) {
@@ -136,7 +135,7 @@
       this.buildThreads();
       this.buildSourceEvents();
 
-      this.resize();
+      this.render();
     },
 
     _intervalH: 15,
@@ -232,6 +231,9 @@
 
       for (var id in this.currentSourceEventIds) {
         var sourceEventId = new SourceEventID({
+          start: this.start,
+          end: this.end,
+          interval: this.end - this.start,
           id: id,
           tasks: this.currentSourceEventIds[id]
         });
@@ -241,7 +243,6 @@
       var name = '';
       if (this._currentThreads) {
         this._currentThreads.some(function(thread) {
-          console.log(id, thread);
           if (Number(thread.threadId) === Number(id)) {
             name = thread.threadName;
             return true;

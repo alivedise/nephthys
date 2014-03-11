@@ -7,6 +7,7 @@
 
   App.prototype = {
     init: function() {
+      this._start = new Date().getTime();
       this.layoutController = new LayoutController();
       this.filter = new Filter();
       this.colorManager = new ColorManager();
@@ -31,6 +32,16 @@
       this._threads.forEach(function(thread) {
         thread.destroy();
       }, this);
+    },
+    debug: function() {
+      console.log('[' + (new Date().getTime()) - this._start + ']' + arguments);
+    },
+    dump: function() {
+      try {
+        throw new Error('x');
+      } catch (e) {
+        console.log(e.stack);
+      }
     }
   };
 

@@ -336,26 +336,41 @@
     }
     this._rendered = true;
 
+    this._canvas.setStart();
+
     /* Render semitransparent overlay */
     this._overlay = this._canvas.rect(0, 0, this.WIDTH, this.HEIGHT)
       .toBack()
       .attr('opacity', 0.9)
       .attr('fill', 'white')
+      .attr('stroke', 'none')
       .hide();
 
+    this._background = this._canvas.rect(0, 0, this.WIDTH, this.HEIGHT)
+      .toBack()
+      .attr('opacity', 0.333)
+      .attr('stroke', 'none')
+      .attr('fill', window.app.colorManager.getColor(this.config.processId));
+
     /* Render border */
-    this._border = this._canvas.rect(0, this.config.offsetY, this.WIDTH, this.HEIGHT)
+    this._border = this._canvas.path('M0 ' + this.HEIGHT + 'L' + this.WIDTH + ' ' + this.HEIGHT)
       .toBack()
       .attr('opacity', 0.9)
-      .attr('stroke', 'grey');
+      .attr('stroke-width', 0.5)
+      .attr('stroke', 'silver');
+
+    this._name = this._canvas.text(0, this.HEIGHT / 2,
+      (this.config.name || this.config.tasks[0].threadId));
+    this._name.attr('font-size', '20')
+              .attr('font-weight', 'bold')
+              .attr('fill', 'white')
+              .attr('stroke', 'grey')
+              .attr('x', this.WIDTH / 2);
+
+    this._set = this._canvas.setFinish();
+    this._set.transform('t0,' + this.config.offsetY);
 
     this.renderTasks();
-
-    this._name = this._canvas.text(0, this.HEIGHT / 2 + (this.config.offsetY),
-      this.config.name || (this.config.tasks ? this.config.tasks[0].threadId : ''));
-    this._name.attr('font-size', '20')
-              .attr('fill', window.app.colorManager.getColor(this.config.processId))
-              .attr('x', this.WIDTH / 2);
 
     /* Render separators of levels of nested event loops */
     if (this.levelStarts.length >= 3) {
@@ -366,7 +381,8 @@
         var g = this._canvas.path('M 0 ' + y + ' l ' + this.WIDTH + ' 0')
           .attr('fill', 'none')
           .attr('stroke-width', 0.1)
-          .attr('stroke', 'green');
+          .attr('stroke', 'green')
+          .transform('t0,' + this.config.offsetY);
       }, this);
     }
   };
@@ -469,6 +485,7 @@
     var start = this.config.start + this.config.translate;
     var interval = this.config.interval / this.config.scale;
     this.config.tasks.forEach(function(task) {
+      var currentX = task.view.latency.attr('x');
       var lx = this.WIDTH * (task.dispatch - start) / interval;
       var ex = this.WIDTH * (task.start - start) / interval;
       var lw = (this.WIDTH) * (task.start - task.dispatch) / interval;
@@ -479,6 +496,12 @@
         var x = this.WIDTH * (circle.data('timestamp') - start) / interval;
         circle.attr('cx', x);
       }, this);
+      if (task.from) {
+        task.from.transform('...t' + (lx - currentX) + ',0');
+      }
+      if (task.to) {
+        task.to.transform('...t' + (lx - currentX) + ',0');
+      }
     }, this);
   };
 

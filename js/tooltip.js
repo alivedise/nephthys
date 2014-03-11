@@ -36,6 +36,15 @@
     this._rendered = true;
     this.containerElement.append(this.template());
     this.element = $('#isis-tooltip');
+    var element = this.element
+    this.element.find('[name="tooltip-source-event-id"]').change(function(){
+      if ($(this).is(':checked')) {
+        window.broadcaster.emit('-source-event-id-filtered',
+          element.data('task').sourceEventId);
+      } else {
+        window.broadcaster.emit('-source-event-id-filtered');
+      }
+    });
     this.element.hide();
   };
 
@@ -46,6 +55,7 @@
     this._registered = true;
 
     window.broadcaster.on('-task-hovered', function(task, x, y) {
+      this.element.data('task', task);
       if (this.element.find('.taskId').text() === String(task.taskId)) {
         return;
       }
@@ -62,13 +72,6 @@
       this.element.find('.execution').text(task.end - task.start);
       this.element.find('.latency').text(task.start - task.dispatch);
       this.element.find('.colorSample').css({ color: window.app.colorManager.getColor(task.sourceEventId)});
-      this.element.find('[name="tooltip-source-event-id"]').change(function(){
-        if ($(this).is(':checked')) {
-          window.broadcaster.emit('-source-event-id-filtered', task.sourceEventId);
-        } else {
-          window.broadcaster.emit('-source-event-id-filtered');
-        }
-      });
       if (task.parentTask) {
         this.element.find('.parent-task-thread-id').text(task.parentTask.threadId).css({ backgroundColor: window.app.colorManager.getColor(task.parentTask.threadId)});
       } else {
@@ -90,7 +93,7 @@
     }.bind(this));
   };
 
-  Tooltip.prototype.MAX_WIDTH = 250;
+  Tooltip.prototype.MAX_WIDTH = 350;
   Tooltip.prototype.MAX_HEIGHT = 400;
 
   Tooltip.prototype.getProperLayout = function(x, y, w, h) {
