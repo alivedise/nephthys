@@ -5,6 +5,7 @@
   var _id = 0;
   var Thread = function(config) {
     this.config = config;
+    this.threadId = this.config.threadId || this.config.tasks[0].threadId;
     this.init();
     this.instanceID = this.CLASS_NAME + _id++;
     Thread[this.instanceID] = this;
@@ -360,6 +361,7 @@
       .attr('stroke', 'silver');
 
     this._name = this._canvas.text(0, this.HEIGHT / 2,
+      '[' + window.app.processManager.getProcessName(this.config.processId) + ']' +
       (this.config.name || this.config.tasks[0].threadId));
     this._name.attr('font-size', '20')
               .attr('font-weight', 'bold')

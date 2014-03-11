@@ -128,6 +128,7 @@
       if (Array.isArray(object.tasks)) {
         this.currentTasks = object.tasks;
         this._currentThreads = object.threads;
+        window.app.threadManager.update(this._currentThreads);
         window.app.processManager.update(object);
       }
       window.broadcaster.emit('tasks-initing', this.currentTasks);

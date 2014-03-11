@@ -5,6 +5,7 @@
     this.app = app;
     window.broadcaster.on('profile-imported-stage-0', this.init.bind(this));
     window.broadcaster.on('-thread-created', this.addThread.bind(this));
+    window.broadcaster.on('process-focused', this.focusThread.bind(this));
     /** Trigger tooltip for tasks */
     this.element.mousemove(function(evt) {
       if (!this._canvas) {
@@ -79,6 +80,33 @@
     this._threads = {};
     this.HEIGHT = 0;
   };
-
+  ThreadManager.prototype.update = function(threads) {
+    this._currentThreads = threads;
+  };
+  ThreadManager.prototype.getThreadName = function(id) {
+    var name = '';
+    if (this._currentThreads) {
+      this._currentThreads.some(function(thread) {
+        if (Number(thread.threadId) === Number(id)) {
+          name = thread.threadName;
+          return true;
+        }
+      }, this)
+    }
+    return name;
+  };
+  ThreadManager.prototype.focusThread = function(processId) {
+    if (!this._currentThreads) {
+      return;
+    }
+    for (var id in this._threads) {
+      if (String(this._threads[id].config.tasks[0].processId) == String(processId)) {
+        console.log('matched');
+        document.getElementById('canvas').scrollTop =
+          this._threads[id].config.offsetY;
+        return;
+      }
+    }
+  };
   exports.ThreadManager = ThreadManager;
 }(this));

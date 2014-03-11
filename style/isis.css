@@ -174,3 +174,18 @@ fieldset[disabled] .btn-sample.active {
   color: #611BBD; 
   background-color: #ffffff; 
 }
+
+
+/* Process label */
+.process {
+  display: inline-block;
+  float: left;
+  margin-left: 1rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.process:hover {
+  background-color: black;
+  color: white;
+}
