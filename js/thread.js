@@ -431,7 +431,7 @@
               .attr('font-weight', 'bold')
               .attr('fill', 'white')
               .attr('stroke', 'grey')
-              .attr('x', this.WIDTH / 2);
+              .attr('x', this._name.getBBox().width / 2);
 
     this._set = this._canvas.setFinish();
     this._set.transform('t0,' + this.config.offsetY);
