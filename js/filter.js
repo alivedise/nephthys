@@ -127,7 +127,7 @@
 
   proto.template = function() {
     return '<div id="filterToolbar">' +
-        '<button id="filterIcon" class="btn btn-default"><span class="glyphicon glyphicon-filter"></span>filter</button></div>' +
+        '<button id="filterIcon" class="btn btn-default"><span class="glyphicon glyphicon-filter"></span></button></div>' +
         '<div class="well" id="filter">' +
         '<fieldset>' +
           '<!-- Form Name -->' +
@@ -153,13 +153,6 @@
 
           '<div class="input-group">' +
             '<button type="button" class="btn btn-warning" id="clear-filter">Clear all filter</button>' +
-          '</div>' +
-
-          '<div class="input-group">' +
-            '<div class="btn-group" id="thread-filter">' +
-              '<button type="button" class="btn btn-sample active" id="open-all-threads">Open /</button>' +
-              '<button type="button" class="btn btn-sample" id="close-all-threads">Close all threads</button>' +
-            '</div>' +
           '</div>' +
 
           '<legend><small>Filter id</small></legend>' +

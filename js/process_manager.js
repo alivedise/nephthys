@@ -20,7 +20,7 @@
     this._processes.forEach(function(process) {
       var processElement = $('<div class="process" data-id="' + process.processId + '"><span style="color: ' +
         this.app.colorManager.getColor(process.processId) + '">█ </span><span>' +
-        process.processName + '</span></div>');
+        (process.processName || process.processId) + '</span></div>');
       $(this.containerElement).append(processElement);
     }, this);
   };

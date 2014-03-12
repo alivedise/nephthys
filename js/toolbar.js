@@ -1,7 +1,8 @@
 'use strict';
 
 (function(exports) {
-  exports.ScaleToolBar = function() {
+  exports.ScaleToolBar = function(app) {
+    this.app = app;
     this.render();
     this.element.hide();
     window.broadcaster.on('profile-imported', this.init.bind(this));

@@ -8,7 +8,12 @@
     SourceEventID[this.id] = this;
     this.buildConnections = this.buildConnections.bind(this);
 
-    window.broadcaster.on('-source-event-id-filtered', this.buildConnections);
+    var self = this;
+    window.broadcaster.on('-source-event-id-filtered', function(sourceEventId) {
+      window.broadcaster.on('-thread-manager-ui-updated', function on() {
+        self.buildConnections(sourceEventId);
+      });
+    });
     window.broadcaster.emit('-source-event-id-created');
   };
   SourceEventID.prototype = new EventEmitter();
@@ -18,17 +23,17 @@
 
 
   SourceEventID.prototype.buildConnections = function(sourceEventId) {
-    console.log(sourceEventId, this.id);
     if (!sourceEventId || String(sourceEventId) !== String(this.id)) {
       if (this._set) {
         this.destroyConnections();
       }
       return;
     }
-    console.log('building connections for source event id: ', this.id);
-    window.app.dump();
     if (!this._canvas) {
       this._canvas = window.app.threadManager.getCanvas();
+    }
+    if (this._set) {
+      this.destroyConnections();
     }
     var set = this._canvas.set();
     var tasks = window.app.taskManager.getTasks();
@@ -58,7 +63,6 @@
       arrow[1].data('target', parent);
       task.to = arrow[0];
       parent.from = arrow[1];
-      console.log(arrow);
     }, this);
     this._set = set;
   };

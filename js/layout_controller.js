@@ -13,7 +13,7 @@
     layout: {
       filter: 0,
       header: 50,
-      timeline: 40,
+      timeline: 20,
       info: 40
     },
     getHeight: function() {

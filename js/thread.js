@@ -31,7 +31,9 @@
     '-thread-manager-move-left': '_thread_manager_move_left',
     '-scale-toolbar-zoom-in': '_scale_toolbar_zoom_in',
     '-scale-toolbar-zoom-out': '_scale_toolbar_zoom_out',
-    '-scale-toolbar-reset': '_scale_toolbar_reset'
+    '-scale-toolbar-reset': '_scale_toolbar_reset',
+    '-thread-toggler-opened': 'open',
+    '-thread-toggler-closed': 'close'
   };
 
   Thread.prototype.CLASS_NAME = 'thread-';
@@ -152,8 +154,9 @@
 
     this.WIDTH = this.containerElement.width();
     var num_bags = this.levelStarts[this.levelStarts.length - 1];
+    this.MINIMAP_HEIGHT = Math.max(num_bags, 18);
     if (num_bags) {
-      this.HEIGHT = (num_bags + 1) * (this._intervalH + this._taskHeight);
+      this.HEIGHT = (num_bags + 1) * (this._intervalH + this._taskHeight) + (num_bags);
     } else {
       this.HEIGHT = 500;
     }
@@ -222,6 +225,10 @@
       this.config.translate = translate;
       this.repositionTasks();
     }
+  };
+
+  Thread.prototype._thread_toggler_toggled = function() {
+    this.toggle();
   };
 
   Thread.prototype._thread_manager_move_left = function() {
@@ -368,9 +375,9 @@
     }
     this.config.tasks.forEach(function(task) {
       task.view.set.show();
-      task.view.execution.attr('y', task.y);
     }, this);
     this.folded = false;
+    window.broadcaster.emit('-thread-request-open', this);
   };
 
   Thread.prototype.close = function() {
@@ -379,9 +386,9 @@
     }
     this.config.tasks.forEach(function(task) {
       task.view.set.hide();
-      task.view.execution.show().attr('y', 0);
     }, this);
     this.folded = true;
+    window.broadcaster.emit('-thread-request-close', this);
   };
 
   Thread.prototype.update = function() {
@@ -411,11 +418,10 @@
       .attr('stroke', 'none')
       .hide();
 
-    this._background = this._canvas.rect(0, 0, this.WIDTH, this.HEIGHT)
+    this._minimap = this._canvas.rect(0, 0, this.WIDTH, this.MINIMAP_HEIGHT)
       .toBack()
-      .attr('opacity', 0.333)
       .attr('stroke', 'none')
-      .attr('fill', window.app.colorManager.getColor(this.config.processId));
+      .attr('fill', '#eee');
 
     /* Render border */
     this._border = this._canvas.path('M0 ' + this.HEIGHT + 'L' + this.WIDTH + ' ' + this.HEIGHT)
@@ -424,14 +430,14 @@
       .attr('stroke-width', 0.1)
       .attr('stroke', 'silver');
 
-    this._name = this._canvas.text(0, this.HEIGHT / 2,
+    this._name = this._canvas.text(0, 0,
       '[' + window.app.processManager.getProcessName(this.config.processId) + ']' +
       (this.config.name || this.config.tasks[0].threadId));
-    this._name.attr('font-size', '20')
+    this._name.attr('font-size', '15')
               .attr('font-weight', 'bold')
-              .attr('fill', 'white')
-              .attr('stroke', 'grey')
-              .attr('x', this._name.getBBox().width / 2);
+              .attr('fill', window.app.colorManager.getColor(this.config.processId))
+              .attr('x', this._name.getBBox().width / 2)
+              .attr('y', this._name.getBBox().height / 2);
 
     this._set = this._canvas.setFinish();
     this._set.transform('t0,' + this.config.offsetY);
@@ -448,7 +454,7 @@
           .attr('fill', 'none')
           .attr('stroke-width', 0.1)
           .attr('stroke', 'green')
-          .transform('t0,' + this.config.offsetY);
+          .transform('t0,' + (this.config.offsetY + this.MINIMAP_HEIGHT));
       }, this);
     }
   };
@@ -532,10 +538,10 @@
     }
 
     var set = this._canvas.setFinish();
-    set.transform('t0,' + this.config.offsetY);
+    set.transform('t0,' + (this.config.offsetY + this.MINIMAP_HEIGHT));
     task.y = y;
     task.x = lx;
-    task.offsetY = this.config.offsetY;
+    task.offsetY = this.config.offsetY + this.MINIMAP_HEIGHT;
     task.view = {
       latency: latency,
       execution: execution,
@@ -544,6 +550,12 @@
     };
     task.rendered = true;
 
+    /* Render MINIMAP */
+    var pathString = 'M' + ex + ',' + task.place_y + 'L' + (ex + ew) + ',' + task.place_y;
+    var mini_task = this._canvas.path(pathString)
+                                .attr('stroke', c);
+    mini_task.transform('t0,' + this.config.offsetY);
+    this._set.push(mini_task);
     window.broadcaster.emit('-task-rendered', task, ex, ew, task.threadId);
   };
 
@@ -563,7 +575,7 @@
         circle.attr('cx', x);
       }, this);
       if (task.from) {
-        task.from.transform('...t' + (lx - currentX) + ',0');
+        task.from.transform('..t' + (lx - currentX) + ',0');
       }
       if (task.to) {
         task.to.transform('...t' + (lx - currentX) + ',0');
@@ -578,6 +590,32 @@
 
   Thread.prototype.unhighlight = function() {
     this._overlay.hide();
+  };
+
+  Thread.prototype.getHeight = function() {
+    if (this.folded) {
+      return this.MINIMAP_HEIGHT;
+    } else {
+      return this.HEIGHT;
+    }
+  };
+
+  Thread.prototype.updateOffset = function(offset) {
+    if (this.config.offsetY === offset) {
+      return;
+    }
+    this.config.offsetY = offset;
+    this._set.transform('').transform('t0,' + offset);
+    this.config.tasks.forEach(function(task) {
+      task.offsetY = offset + this.MINIMAP_HEIGHT;
+      task.view.set.transform('').transform('t0,' + task.offsetY);
+      if (task.from) {
+        // XXX: Reposition connections
+      }
+      if (task.to) {
+        // XXX: Reposition connections
+      }
+    }, this);
   };
 
   exports.Thread = Thread;

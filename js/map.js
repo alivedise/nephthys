@@ -18,7 +18,8 @@
   Raphael.fn.arrow = function (x1, y1, x2, y2, size, color) {
     var angle = Math.atan2(x1-x2,y2-y1);
     angle = (angle / (2 * Math.PI)) * 360;
-    var arrowPath = this.path('M' + x2 + ' ' + y2 + ' L' + (x2 - size) + ' ' + (y2 - size) + ' L' + (x2 - size) + ' ' + (y2 + size) + ' L' + x2 + ' ' + y2 ).attr('stroke', color).attr('opacity', 0.5).rotate((90+angle),x2,y2);
+    //var arrowPath = this.path('M' + x2 + ' ' + y2 + ' L' + (x2 - size) + ' ' + (y2 - size) + ' L' + (x2 - size) + ' ' + (y2 + size) + ' L' + x2 + ' ' + y2 ).attr('stroke', color).attr('opacity', 0.5).transform('r' + (90+angle)).data('angle', 90 + angle);
+    var arrowPath = this.circle(x2, y2, 1).attr('stroke', color).attr('opacity', 0.5).hide(); // cannot transform!!!
     var linePath = this.path('M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2).attr('stroke', color).attr('opacity', 0.5);
     return [linePath, arrowPath];
   }
@@ -128,7 +129,6 @@
       if (Array.isArray(object.tasks)) {
         this.currentTasks = object.tasks;
         this._currentThreads = object.threads;
-        window.app.threadManager.update(this._currentThreads);
         window.app.processManager.update(object);
       }
       window.broadcaster.emit('tasks-initing', this.currentTasks);
