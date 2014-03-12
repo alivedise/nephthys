@@ -421,7 +421,7 @@
     this._border = this._canvas.path('M0 ' + this.HEIGHT + 'L' + this.WIDTH + ' ' + this.HEIGHT)
       .toBack()
       .attr('opacity', 0.9)
-      .attr('stroke-width', 0.5)
+      .attr('stroke-width', 0.1)
       .attr('stroke', 'silver');
 
     this._name = this._canvas.text(0, this.HEIGHT / 2,
