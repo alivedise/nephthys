@@ -51,6 +51,24 @@
       }
       window.broadcaster.emit('-thread-manager-zoom-in', x, y, this.WIDTH, this.HEIGHT);
     }.bind(this));
+
+    $(document).keydown(function(evt) {
+      if (!this._currentThreads) {
+        return;
+      }
+      switch (evt.keyCode) {
+        case 37:
+          window.broadcaster.emit('-thread-manager-move-left');
+          break;
+        case 38:
+          break;
+        case 39:
+          window.broadcaster.emit('-thread-manager-move-right');
+          break;
+        case 40:
+          break;
+      }
+    }.bind(this));
   };
   ThreadManager.prototype = new EventEmitter();
   ThreadManager.prototype.getCanvas = function() {

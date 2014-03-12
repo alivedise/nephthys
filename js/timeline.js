@@ -33,7 +33,6 @@
     this.element.mouseup(this._on_mouseup.bind(this));
 
     window.broadcaster.on('profile-imported-stage-0', function() {
-      console.log('imported');
       this.ENABLED = true;
       this._canvas.clear();
       this.render_range();
@@ -45,9 +44,13 @@
     }.bind(this));
 
     window.broadcaster.on('-task-transformed', function(translate, scale) {
-      this.range.show()
+      if (scale === 1) {
+        this.range.hide();
+      } else {
+        this.range.show()
                 .attr('x', this.WIDTH * (translate) / this.interval)
                 .attr('width', this.WIDTH / scale);
+      }
     }.bind(this));
 
     this._miniThreads = {};

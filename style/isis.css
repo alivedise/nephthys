@@ -9,21 +9,6 @@ textarea {
   display: none;
 }
 
-#filter {
-  position: absolute;
-  bottom: 65px;
-  left: 5px;
-  z-index: 99999;
-}
-
-#filterToolbar {
-  position: absolute;
-  bottom: 50px;
-  left: 5px;
-  z-index: 99999;
-  cursor: pointer;
-}
-
 #process-mapping {
   margin: 5px;
 }
@@ -67,7 +52,6 @@ textarea {
 }
 
 #ui-top {
-  padding-left: 70px;
   overflow: hidden;
   background-color: #eee;
 }
@@ -175,6 +159,21 @@ fieldset[disabled] .btn-sample.active {
   background-color: #ffffff; 
 }
 
+/* filter */
+#filter {
+  position: absolute;
+  bottom: 65px;
+  left: 5px;
+  z-index: 99999;
+}
+
+#filterToolbar {
+  position: absolute;
+  bottom: 50px;
+  left: 5px;
+  z-index: 99999;
+  cursor: pointer;
+}
 
 /* Process label */
 .process {
@@ -188,4 +187,12 @@ fieldset[disabled] .btn-sample.active {
 .process:hover {
   background-color: black;
   color: white;
+}
+
+/* Scale */
+#scaleToolbar {
+  position: absolute;
+  bottom: 50px;
+  right: 5px;
+  z-index: 99999;
 }

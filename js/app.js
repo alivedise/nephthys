@@ -18,6 +18,7 @@
       this.threadManager = new ThreadManager(this);
       this.processManager = new ProcessManager(this);
       this.progress = new Progress(this);
+      this.scaleToolBar = new ScaleToolBar();
       this.register();
     },
     _threads: [],

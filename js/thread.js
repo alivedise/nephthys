@@ -26,7 +26,12 @@
     'timeline-range-changed': '_timeline_range_changed',
     '-filter-label-toggle': '_filter_label_toggle',
     '-task-id-toggle': '_task_id_toggle',
-    '-thread-manager-zoom-in': '_thread_manager_zoom_in'
+    '-thread-manager-zoom-in': '_thread_manager_zoom_in',
+    '-thread-manager-move-right': '_thread_manager_move_right',
+    '-thread-manager-move-left': '_thread_manager_move_left',
+    '-scale-toolbar-zoom-in': '_scale_toolbar_zoom_in',
+    '-scale-toolbar-zoom-out': '_scale_toolbar_zoom_out',
+    '-scale-toolbar-reset': '_scale_toolbar_reset'
   };
 
   Thread.prototype.CLASS_NAME = 'thread-';
@@ -190,6 +195,57 @@
     this.config.translate = this.config.translate + ((x - x / s) / this.config.scale) * this.config.interval / this.WIDTH;
     this.config.scale = this.config.scale * s;
     this.repositionTasks();
+  };
+
+  Thread.prototype._scale_toolbar_reset = function(s) {
+    if (this.config.scale !== 1) {
+      this.config.scale = 1;
+      this.config.translate = 0;
+      this.repositionTasks();
+    }
+  };
+
+  Thread.prototype._scale_toolbar_zoom_in = function(s) {
+    this.config.translate = this.config.translate;
+    this.config.scale = this.config.scale * s;
+    this.repositionTasks();
+  };
+
+  Thread.prototype._scale_toolbar_zoom_out = function(s) {
+    var scale = this.config.scale / s;
+    if (scale <= 1) {
+      scale = 1;
+    }
+    var translate = this.config.translate;
+    if (this.config.scale !== scale) {
+      this.config.scale = scale;
+      this.config.translate = translate;
+      this.repositionTasks();
+    }
+  };
+
+  Thread.prototype._thread_manager_move_left = function() {
+    var s = 5;
+    var translate = this.config.translate - this.config.translate / ( s *this.config.scale );
+    if (translate <= 0) {
+      translate = 0;
+    }
+    if (translate !== this.config.translate) {
+      this.config.translate = translate;
+      this.repositionTasks();
+    }
+  };
+
+  Thread.prototype._thread_manager_move_right = function() {
+    var s = 5;
+    var translate = this.config.translate + this.config.translate / ( s * this.config.scale );
+    if (translate + this.WIDTH / this.config.scale >= this.config.interval) {
+      translate = this.config.interval - this.WIDTH / this.config.scale;
+    }
+    if (translate !== this.config.translate) {
+      this.config.translate = translate;
+      this.repositionTasks();
+    }
   };
 
   Thread.prototype._filter_source_event_ids = function(ids) {
