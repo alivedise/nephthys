@@ -45,7 +45,6 @@
       var x = evt.pageX;
       var y = evt.pageY;
       var ele = this._canvas.getElementByPoint(x, y);
-      console.log(x, y, evt, ele);
       if (!ele) {
         window.broadcaster.emit('-task-out');
         return;

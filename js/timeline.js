@@ -44,6 +44,12 @@
       this.interval = interval;
     }.bind(this));
 
+    window.broadcaster.on('-task-transformed', function(translate, scale) {
+      this.range.show()
+                .attr('x', this.WIDTH * (translate) / this.interval)
+                .attr('width', this.WIDTH / scale);
+    }.bind(this));
+
     this._miniThreads = {};
     this._miniThreadsCount = 1;
     window.broadcaster.on('-task-rendered', function(task, x, w, tid) {

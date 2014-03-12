@@ -186,9 +186,9 @@
   };
 
   Thread.prototype._thread_manager_zoom_in = function(x, y, w, h) {
-    console.log(x, y, w, h, this.config.translate, this.config.scale);
-    this.config.translate = this.config.translate + this.config.scale * x;
-    this.config.scale = this.config.scale * 2;
+    var s = 3;
+    this.config.translate = this.config.translate + ((x - x / s) / this.config.scale) * this.config.interval / this.WIDTH;
+    this.config.scale = this.config.scale * s;
     this.repositionTasks();
   };
 
@@ -513,6 +513,7 @@
         task.to.transform('...t' + (lx - currentX) + ',0');
       }
     }, this);
+    window.broadcaster.emit('-task-transformed', this.config.translate, this.config.scale);
   };
 
   Thread.prototype.highlight = function(element) {
