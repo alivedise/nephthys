@@ -317,15 +317,13 @@
 
   Thread.prototype._filter_label_toggle = function(value) {
     if (value) {
-      if (!this._overlay.isVisible) {
-        this._overlay.show().toFront();
-      }
       var found = false;
       this.config.tasks.forEach(function(task) {
         if (task.labels && task.labels.length > 0) {
           found = true;
-          this.highlight(task.view.set);
+          task.view.set.show();
         } else {
+          task.view.set.hide();
         }
       }, this);
       if (!found) {
@@ -333,7 +331,6 @@
       }
     } else {
       this.open();
-      this.unhighlight();
     }
   };
 
@@ -353,7 +350,6 @@
     this.config.tasks.forEach(function(task) {
       task.view.set.show();
     }, this);
-    this._overlay.hide();
     this.open();
   };
 
@@ -582,14 +578,6 @@
       }
     }, this);
     window.broadcaster.emit('-task-transformed', this.config.translate, this.config.scale);
-  };
-
-  Thread.prototype.highlight = function(element) {
-    element.toFront();
-  };
-
-  Thread.prototype.unhighlight = function() {
-    this._overlay.hide();
   };
 
   Thread.prototype.getHeight = function() {
