@@ -21,18 +21,19 @@
     this.filterUI = $('#filter').hide();
     this.typeSelector = $('#bySourceEventType');
     this.idSelector = $('#bySourceEventId');
-    this.labelSelector = $('#byLabel');
   };
 
   proto.init = function() {
     this.render();
     this.typeSelector.change(this.renderIdSelector.bind(this));
     this.idSelector.change(this.emitId.bind(this));
-    this.labelSelector.change(this.emitLabel.bind(this));
     this.filterToggleButton.click(function() {
       this.filterUI.toggle();
     }.bind(this));
-    $('select').selectpicker({
+    this.typeSelector.selectpicker({
+      liveSearch: true
+    });
+    this.idSelector.selectpicker({
       liveSearch: true
     });
     window.broadcaster.on('canvas-focused', function() {
@@ -40,7 +41,6 @@
     }.bind(this));
     window.broadcaster.on('-source-event-type-created', this.addToTypeSelector.bind(this));
     window.broadcaster.on('profile-imported-stage-0', this.clear.bind(this));
-    window.broadcaster.on('-label-rendered', this.addLabel.bind(this));
     window.broadcaster.on('-source-event-id-filtered', this.filterBySourceEventId.bind(this));
 
     $('#thread-filter button').click(function() {
@@ -55,24 +55,11 @@
     this.activeSourceEventId = id;
   };
 
-  proto.addLabel = function(label) {
-    if (this._labels.indexOf(label) < 0) {
-      this._labels.push(label);
-    } else {
-      return;
-    }
-    this.labelSelector.append('<option value="' + label + '">' + label + '</option>');
-    $('select').selectpicker('refresh');
-  };
-
   proto.clear = function() {
     this.activeSourceEventId = null;
     this.typeSelector.html('');
     this.idSelector.html('');
-    this.labelSelector.html('');
     this._sourceEventTypes = [];
-    this._labels = [];
-    this._tasks = [];
     this.filterToolbar.show();
   };
 
@@ -104,26 +91,12 @@
     window.broadcaster.emit('-filter-source-event-ids', $(evt.target).val());
   };
 
-  proto.emitLabel = function(evt) {
-    window.broadcaster.emit('-filter-label', $(evt.target).val());
-  };
-
   proto.template = function() {
     return '<div id="filterToolbar">' +
         '<button id="filterIcon" class="btn btn-default"><span class="glyphicon glyphicon-filter"></span></button></div>' +
         '<div class="well" id="filter">' +
         '<fieldset>' +
           '<!-- Form Name -->' +
-          '<legend><small>Filter label</small></legend>' +
-
-          '<!-- Select Multiple -->' +
-          '<div class="input-group">' +
-            '<label class="control-label" for="bySourceEventId">By labels</label>' +
-            '<div class="controls">' +
-              '<select id="byLabel" name="byLabel" class="input-xlarge" multiple="multiple" class="selectpicker">' +
-              '</select>' +
-            '</div>' +
-          '</div>' +
 
           '<legend><small>Filter id</small></legend>' +
 

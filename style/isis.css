@@ -9,6 +9,10 @@ textarea {
   display: none;
 }
 
+.modal-dialog .bootstrap-select {
+  margin-top: 9px;
+}
+
 #process-mapping {
   margin: 5px;
 }
@@ -17,7 +21,7 @@ textarea {
 }
 
 #header {
-  z-index: 999; 
+  z-index: 999999; 
 }
 
 #progress {
@@ -43,7 +47,6 @@ textarea {
 
 #ruler {
   height: 20px;
-  background-color: grey;
 }
 
 .navbar-brand h4 {
@@ -53,7 +56,6 @@ textarea {
 
 #ui-top {
   overflow: hidden;
-  background-color: #eee;
 }
 
 .layout-west {
@@ -84,11 +86,6 @@ body legend {
 
 .input-group {
   margin-bottom: 5px;
-}
-
-#file-chooser a.btn {
-  color: white;
-  padding-top: 12px;
 }
 
 /* Style for threadUI */
@@ -212,6 +209,10 @@ fieldset[disabled] .btn-sample.active {
   right: 125px;
   z-index: 99999;
   opacity: 0.5;
+}
+
+/* label selector */
+.label-selector {
 }
 
 /* timeline */

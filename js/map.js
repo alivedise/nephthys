@@ -38,13 +38,10 @@
     end: 0,
     interval: 0,
     count: 0,
-    chooseButton: document.getElementById('choose'),
-    source: document.getElementById('source'),
-    tooltip: null,
-    mapContainer: document.getElementById('mapContainer'),
-    slideContainer: $('#slideContainer'),
     init: function Isis_init() {
-      source.addEventListener('change', this);
+      this.chooseButton = document.getElementById('choose');
+      this.mapContainer = document.getElementById('mapContainer');
+      this.slideContainer = $('#slideContainer');
       var self = this;
       $(function() {
         $('input[type=file]').bootstrapFileInput();
@@ -70,8 +67,7 @@
           return function(e) {
             window.broadcaster.emit('profile-imported-stage-0');
             window.broadcaster.emit('profile-imported');
-            self.source.value = e.target.result;
-            self.parse(self.source.value);
+            self.parse(e.target.result);
           };
         })(f);
 
@@ -241,6 +237,5 @@
       return name;
     }
   };
-  Isis.init();
   window.Isis = Isis;
 }(this));

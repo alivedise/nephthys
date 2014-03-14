@@ -17,11 +17,15 @@
       this.taskManager = new TaskManager(this);
       this.threadManager = new ThreadManager(this);
       this.processManager = new ProcessManager(this);
-      this.progress = new Progress(this);
+      // this.progress = new Progress(this);
       this.scaleToolBar = new ScaleToolBar(this);
       this.labelToolBar = new LabelToolBar(this);
+      this.labelSelector = new LabelSelector(this);
       this.threadToggler = new ThreadToggler(this);
+      this.setupDialog = new SetupDialog(this);
       this.register();
+
+      Isis.init();
     },
     _threads: [],
     register: function() {

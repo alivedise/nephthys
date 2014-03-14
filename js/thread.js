@@ -369,6 +369,8 @@
     if (!this.folded) {
       return;
     }
+
+    this._background.show();
     this.config.tasks.forEach(function(task) {
       task.view.set.show();
     }, this);
@@ -380,6 +382,7 @@
     if (this.folded) {
       return;
     }
+    this._background.hide();
     this.config.tasks.forEach(function(task) {
       task.view.set.hide();
     }, this);
@@ -419,6 +422,14 @@
       .attr('stroke', 'none')
       .attr('fill', '#eee');
 
+    var processColor = window.app.colorManager.getColor(this.config.processId);
+
+    this._background = this._canvas.rect(0, this.MINIMAP_HEIGHT, this.WIDTH, this.HEIGHT - this.MINIMAP_HEIGHT)
+      .toBack()
+      .attr('stroke', 'none')
+      .attr('fill', processColor)
+      .attr('opacity', 0.1);
+
     /* Render border */
     this._border = this._canvas.path('M0 ' + this.HEIGHT + 'L' + this.WIDTH + ' ' + this.HEIGHT)
       .toBack()
@@ -431,7 +442,7 @@
       (this.config.name || this.config.tasks[0].threadId));
     this._name.attr('font-size', '15')
               .attr('font-weight', 'bold')
-              .attr('fill', window.app.colorManager.getColor(this.config.processId))
+              .attr('fill', processColor)
               .attr('x', this._name.getBBox().width / 2)
               .attr('y', this._name.getBBox().height / 2);
 
