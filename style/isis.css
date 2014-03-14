@@ -31,7 +31,7 @@ textarea {
 
 #isis-tooltip {
   position: absolute;
-  z-index: 2048;
+  z-index: 10000;
   display: none;
   min-width: 250px;
   overflow-y: auto;
@@ -203,6 +203,15 @@ fieldset[disabled] .btn-sample.active {
   bottom: 90px;
   right: 5px;
   z-index: 99999;
+}
+
+/* label toolbar */
+#label-toolbar {
+  position: absolute;
+  bottom: 50px;
+  right: 165px;
+  z-index: 99999;
+  opacity: 0.5;
 }
 
 /* timeline */

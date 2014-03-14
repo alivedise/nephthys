@@ -19,6 +19,7 @@
       this.processManager = new ProcessManager(this);
       this.progress = new Progress(this);
       this.scaleToolBar = new ScaleToolBar(this);
+      this.labelToolBar = new LabelToolBar(this);
       this.threadToggler = new ThreadToggler(this);
       this.register();
     },

@@ -29,7 +29,6 @@
   }
 
   var Isis = {
-    random: document.getElementById('random'),
     TIME_FACTOR: 0.5,
     WIDTH: 700,
     HEIGHT: 800,
@@ -39,7 +38,6 @@
     end: 0,
     interval: 0,
     count: 0,
-    parseButton: document.getElementById('parse'),
     chooseButton: document.getElementById('choose'),
     source: document.getElementById('source'),
     tooltip: null,
@@ -47,7 +45,6 @@
     slideContainer: $('#slideContainer'),
     init: function Isis_init() {
       source.addEventListener('change', this);
-      this.random.addEventListener('click', this);
       var self = this;
       $(function() {
         $('input[type=file]').bootstrapFileInput();
@@ -87,16 +84,7 @@
       console.log('handling ' + evt.type + ' on ' + evt.target);
       switch (evt.target) {
         case this.source:
-        case this.parseButton:
           this.parse(evt.target.value);
-          break;
-        case this.random:
-          var self = this;
-          var done = function done(value) {
-            self.source.value = JSON.stringify(TaskTracer.dump());
-            self.parse(self.source.value);
-          };
-          TaskTracer.run(done);
           break;
       }
     },

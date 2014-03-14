@@ -31,7 +31,8 @@
     <script src="js/progress.js" defer></script>
     <script src="js/map.js" defer></script>
     <script src="js/timeline.js" defer></script>
-    <script src="js/toolbar.js" defer></script>
+    <script src="js/scale_toolbar.js" defer></script>
+    <script src="js/label_toolbar.js" defer></script>
     <script src="js/thread_toggler.js" defer></script>
     <script src="js/app.js" defer></script>
     <script src="js/main.js" defer></script>
@@ -41,16 +42,10 @@
     <header class="navbar navbar-inverse layout-north" role="banner" id="header">
       <div class="container">
         <div class="navbar-header">
-          <a href="./" class="navbar-brand">Isis v0.5.4 <h4>TaskTracer GUI</h4></a>
+          <a href="./" class="navbar-brand">Isis v0.5.5 <h4>TaskTracer GUI</h4></a>
         </div>
         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
           <ul class="nav navbar-nav">
-            <li style="display: none;">
-              <button class="btn btn-info" id="random">Random</button>
-            </li>
-            <li style="display: none;">
-              <button class="btn btn-primary" id="parse" hidden>Parse</button>
-            </li>
             <li id="file-chooser">
               <input class="btn-warning" id="choose" type="file" title="Import profile" />
             </li>

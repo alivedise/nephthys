@@ -22,8 +22,6 @@
     this.typeSelector = $('#bySourceEventType');
     this.idSelector = $('#bySourceEventId');
     this.labelSelector = $('#byLabel');
-    this.labelCountSelector = $('#labelCount');
-    this.taskCountSelector = $('#taskCount');
   };
 
   proto.init = function() {
@@ -34,9 +32,6 @@
     this.filterToggleButton.click(function() {
       this.filterUI.toggle();
     }.bind(this));
-    $('#clear-filter').click(function() {
-      window.broadcaster.emit('-filter-cleared');
-    });
     $('select').selectpicker({
       liveSearch: true
     });
@@ -46,12 +41,8 @@
     window.broadcaster.on('-source-event-type-created', this.addToTypeSelector.bind(this));
     window.broadcaster.on('profile-imported-stage-0', this.clear.bind(this));
     window.broadcaster.on('-label-rendered', this.addLabel.bind(this));
-    window.broadcaster.on('-task-rendered', this.addTask.bind(this));
     window.broadcaster.on('-source-event-id-filtered', this.filterBySourceEventId.bind(this));
-    $('#label-filter button').click(function() {
-      $('#label-filter button').addClass('active').not(this).removeClass('active');
-      window.broadcaster.emit('-filter-label-toggle', (this.id === 'label-only'));
-    });
+
     $('#thread-filter button').click(function() {
       $('#thread-filter button').addClass('active').not(this).removeClass('active');
       window.broadcaster.emit(this.id);
@@ -70,14 +61,8 @@
     } else {
       return;
     }
-    this.labelCountSelector.text(this._labels.length);
     this.labelSelector.append('<option value="' + label + '">' + label + '</option>');
     $('select').selectpicker('refresh');
-  };
-
-  proto.addTask = function(task) {
-    this._tasks.push(task);
-    this.taskCountSelector.text(this._tasks.length);
   };
 
   proto.clear = function() {
@@ -88,8 +73,6 @@
     this._sourceEventTypes = [];
     this._labels = [];
     this._tasks = [];
-    this.taskCountSelector.text(this._tasks.length);
-    this.labelCountSelector.text(this._labels.length);
     this.filterToolbar.show();
   };
 
@@ -140,19 +123,6 @@
               '<select id="byLabel" name="byLabel" class="input-xlarge" multiple="multiple" class="selectpicker">' +
               '</select>' +
             '</div>' +
-          '</div>' +
-
-          '<legend><small>Toggles</small></legend>' +
-
-          '<div class="input-group">' +
-            '<div class="btn-group" id="label-filter">' +
-              '<button type="button" class="btn btn-info active" id="not-label-only">All <span class="badge" id="taskCount"></span></button>' +
-              '<button type="button" class="btn btn-info" id="label-only">Labels only <span class="badge" id="labelCount"></span></button>' +
-            '</div>' +
-          '</div>' +
-
-          '<div class="input-group">' +
-            '<button type="button" class="btn btn-warning" id="clear-filter">Clear all filter</button>' +
           '</div>' +
 
           '<legend><small>Filter id</small></legend>' +
