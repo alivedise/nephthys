@@ -57,9 +57,9 @@
   };
   LabelToolBar.prototype.template = function() {
     return '<div class="btn-group" id="label-toolbar">' +
-              '<button type="button" class="btn btn-info active" id="not-label-only">All <span class="badge" id="taskCount"></span></button>' +
-              '<button type="button" class="btn btn-info" id="label-only">Labels only <span class="badge" id="labelCount"></span></button>' +
-              '<button type="button" class="btn btn-warning" id="clear-filter">Clear all filter</button>' +
+              '<button type="button" class="btn btn-info active btn-xs" id="not-label-only">All <span class="badge" id="taskCount"></span></button>' +
+              '<button type="button" class="btn btn-info btn-xs" id="label-only">Labels only <span class="badge" id="labelCount"></span></button>' +
+              '<button type="button" class="btn btn-warning btn-xs" id="clear-filter">Clear all filter</button>' +
             '</div>';
   };
   exports.LabelToolBar = LabelToolBar;

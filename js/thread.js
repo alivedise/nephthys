@@ -426,7 +426,7 @@
       .attr('stroke-width', 0.1)
       .attr('stroke', 'silver');
 
-    this._name = this._canvas.text(0, 0,
+    this._name = this._canvas.text(0, this.MINIMAP_HEIGHT / 2,
       '[' + window.app.processManager.getProcessName(this.config.processId) + ']' +
       (this.config.name || this.config.tasks[0].threadId));
     this._name.attr('font-size', '15')
