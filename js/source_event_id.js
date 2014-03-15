@@ -50,7 +50,7 @@
       var x2 = source.attrs['x'];
       var y2 = target.attrs['y'] + parent.offsetY;
       if (y1 < y2) {
-        y1 = y1 - source.attr('height') / 2;
+        y1 = y1 + source.attr('height') / 2;
         y2 = y2 + target.attr('height') / 2;
       } else {
         y1 = y1 + source.attr('height') / 2;
