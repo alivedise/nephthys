@@ -233,7 +233,7 @@
 
   Thread.prototype._thread_manager_move_left = function() {
     var s = 5;
-    var translate = this.config.translate - this.config.translate / ( s *this.config.scale );
+    var translate = this.config.translate - this.config.translate / ( s * this.config.scale );
     if (translate <= 0) {
       translate = 0;
     }
@@ -246,8 +246,9 @@
   Thread.prototype._thread_manager_move_right = function() {
     var s = 5;
     var translate = this.config.translate + this.config.translate / ( s * this.config.scale );
-    if (translate + this.WIDTH / this.config.scale >= this.config.interval) {
-      translate = this.config.interval - this.WIDTH / this.config.scale;
+        console.log(translate);
+    if (translate + this.config.interval / this.config.scale >= this.config.interval) {
+      translate = this.config.interval - this.config.interval / this.config.scale;
     }
     if (translate !== this.config.translate) {
       this.config.translate = translate;

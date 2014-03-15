@@ -11,6 +11,7 @@
     var self = this;
     window.broadcaster.on('-source-event-id-filtered', function(sourceEventId) {
       window.broadcaster.on('-thread-manager-ui-updated', function on() {
+        window.broadcaster.off('-thread-manager-ui-updated', on);
         self.buildConnections(sourceEventId);
       });
     });
@@ -25,10 +26,14 @@
   SourceEventID.prototype.buildConnections = function(sourceEventId) {
     if (!sourceEventId || String(sourceEventId) !== String(this.id)) {
       if (this._set) {
+        console.warn(this.id, 'remove current connections..');
         this.destroyConnections();
       }
       return;
     }
+    console.log('building connections for.. ', sourceEventId);
+    window.app.dump();
+    
     if (!this._canvas) {
       this._canvas = window.app.threadManager.getCanvas();
     }
