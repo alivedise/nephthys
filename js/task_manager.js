@@ -13,7 +13,7 @@
   };
 
   TaskManager.prototype.addTask = function(task) {
-    this._tasks[task.taskId] = task;
+    this._tasks[task.taskId || task.id] = task;
   };
 
   TaskManager.prototype.getTasks = function() {

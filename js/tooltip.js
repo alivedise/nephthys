@@ -56,7 +56,7 @@
 
     window.broadcaster.on('-task-hovered', function(task, x, y) {
       this.element.data('task', task);
-      if (this.element.find('.taskId').text() === String(task.taskId)) {
+      if (this.element.find('.taskId').text() === String(task.taskId || task.id)) {
         return;
       }
       if (window.app.filter && window.app.filter.activeSourceEventId == task.sourceEventId) {
@@ -65,7 +65,7 @@
         this.element.find('[name="tooltip-source-event-id"]').prop('checked', false);
       }
       this.element.find('.labels').remove();
-      this.element.find('.taskId').text(task.taskId);
+      this.element.find('.taskId').text(task.taskId || task.id);
       this.element.find('.name').text(task.name);
       this.element.find('.sourceEventId').text(task.sourceEventId);
       this.element.find('.sourceEventType').text(task.sourceEventType);
@@ -80,7 +80,7 @@
       if (task.labels && task.labels.length) {
         this.element.append('<div class="labels"><hr/></div>');
         task.labels.forEach(function(label) {
-          this.element.find('.labels').append('<div><span class="label label-info">'+label.timestamp+'</span><span>'+label.label+'</span></div>')
+          this.element.find('.labels').append('<div><span class="label label-info">'+(label.timestamp || label[0])+'</span><span>'+(label.label || label[1])+'</span></div>')
         }, this);
       }
       this.element.width('auto').height('auto').show();

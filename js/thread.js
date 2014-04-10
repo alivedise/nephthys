@@ -5,7 +5,7 @@
   var _id = 0;
   var Thread = function(config) {
     this.config = config;
-    this.threadId = this.config.threadId || this.config.tasks[0].threadId;
+    this.threadId = this.config.threadId || this.config.id || this.config.tasks[0].threadId;
     this.init();
     this.instanceID = this.CLASS_NAME + _id++;
     Thread[this.instanceID] = this;
@@ -303,7 +303,7 @@
     this.config.tasks.forEach(function(task) {
       if (task.labels && task.labels.length &&
           task.labels.some(function(label) {
-            return (labels.indexOf(label.label) >= 0);
+            return (labels.indexOf(label.label || label[1]) >= 0);
           })) {
         found = true;
         task.view.set.show()
@@ -537,11 +537,11 @@
     /** Render labels **/
     if (task.labels) {
       task.labels.forEach(function(label) {
-        var x = this.WIDTH * (label.timestamp - this.config.start) / this.config.interval;
+        var x = this.WIDTH * ((label.timestamp || label[0]) - this.config.start) / this.config.interval;
         circles.push(this._canvas.circle(x, y + this._taskHeight / 2, 1)
                     .attr('fill', 'red')
-                    .attr('stroke', 'transparent').data('timestamp', label.timestamp));
-        window.broadcaster.emit('-label-rendered', label.label);
+                    .attr('stroke', 'transparent').data('timestamp', label.timestamp || label[0]));
+        window.broadcaster.emit('-label-rendered', label.label || label[1]);
       }, this);
     }
 

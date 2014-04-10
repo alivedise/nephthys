@@ -228,8 +228,8 @@
       var name = '';
       if (this._currentThreads) {
         this._currentThreads.some(function(thread) {
-          if (Number(thread.threadId) === Number(id)) {
-            name = thread.threadName;
+          if (Number(thread.threadId || thread.id) === Number(id)) {
+            name = thread.threadName || thread.name;
             return true;
           }
         }, this)

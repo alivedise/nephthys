@@ -19,8 +19,8 @@
     }
     this._processes.forEach(function(process) {
       var processElement = $('<div class="process" data-id="' + process.processId + '"><span style="color: ' +
-        this.app.colorManager.getColor(process.processId) + '">█ </span><span>' +
-        (process.processName || process.processId) + '</span></div>');
+        this.app.colorManager.getColor(process.processId || process.id) + '">█ </span><span>' +
+        (process.processName || process.name || process.processId || process.id) + '</span></div>');
       $(this.containerElement).append(processElement);
     }, this);
   };
@@ -30,8 +30,8 @@
     }
     var name = '';
     this._processes.some(function(process) {
-      if (Number(process.processId) === Number(id)) {
-        name = process.processName || process.processId;
+      if (Number(process.processId || process.id) === Number(id)) {
+        name = process.processName || process.name || process.processId || process.id;
         return true;
       }
     }, this);

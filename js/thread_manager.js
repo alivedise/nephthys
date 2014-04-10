@@ -81,7 +81,7 @@
     return this._canvas;
   };
   ThreadManager.prototype.addThread = function(thread) {
-    this._threads[thread.threadId] = thread;
+    this._threads[thread.threadId || thread.id] = thread;
     this._currentThreads.push(thread);
     this.HEIGHT += thread.HEIGHT;
     this._canvas.setSize(this.WIDTH, this.HEIGHT);
@@ -98,7 +98,7 @@
     var name = '';
     if (this._currentThreads) {
       this._currentThreads.some(function(thread) {
-        if (Number(thread.threadId) === Number(id)) {
+        if (Number(thread.threadId || thread.id) === Number(id)) {
           name = thread.threadName;
           return true;
         }

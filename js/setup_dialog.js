@@ -15,7 +15,7 @@
     this.element.html('');
   };
   SetupDialog.prototype.render = function() {
-    this.containerElement.append(this.template);
+    this.containerElement.append(this.template());
     this.element = $('#setup-dialog');
     this.element.modal({
       keyboard: false
@@ -32,7 +32,7 @@
                 '<div class="modal-content">' +
                   '<div class="modal-header">' +
                     '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-                    '<h4 class="modal-title" id="myModalLabel">Isis v0.5.9 TaskTracer GUI</h4>' +
+                    '<h4 class="modal-title" id="myModalLabel">Isis ' + this.app.VERSION + ' TaskTracer GUI</h4>' +
                   '</div>' +
                   '<div class="modal-footer">' +
                     '<input class="btn-warning" id="choose" type="file" title="Import profile" />' +
