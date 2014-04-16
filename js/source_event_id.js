@@ -32,8 +32,6 @@
       return;
     }
     console.log('building connections for.. ', sourceEventId);
-    window.app.dump();
-    
     if (!this._canvas) {
       this._canvas = window.app.threadManager.getCanvas();
     }
@@ -43,7 +41,7 @@
     var set = this._canvas.set();
     var tasks = window.app.taskManager.getTasks();
     this.config.tasks.forEach(function(t) {
-      var task = tasks[t.taskId];
+      var task = tasks[t.taskId || t.id];
       var parent = tasks[t.parentTaskId];
       if (!task || !parent || String(parent.sourceEventId) !== String(this.id)) {
         return;

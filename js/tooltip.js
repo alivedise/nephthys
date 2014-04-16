@@ -80,7 +80,10 @@
       if (task.labels && task.labels.length) {
         this.element.append('<div class="labels"><hr/></div>');
         task.labels.forEach(function(label) {
-          this.element.find('.labels').append('<div><span class="label label-info">'+(label.timestamp || label[0])+'</span><span>'+(label.label || label[1])+'</span></div>')
+          this.element.find('.labels').append('<div><span class="label label-info">' +
+            ((label.timestamp || label[0]) - window.app.start) +
+            '</span><span>'+(label.label || label[1]) +
+            '</span></div>');
         }, this);
       }
       this.element.width('auto').height('auto').show();

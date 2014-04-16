@@ -6,7 +6,7 @@
   };
 
   App.prototype = {
-    VERSION: '0.6.0',
+    VERSION: '0.6.1',
     init: function() {
       this._start = new Date().getTime();
       this.layoutController = new LayoutController();
@@ -32,6 +32,7 @@
     register: function() {
       window.broadcaster.on('profile-imported', this._on_profile_imported.bind(this));
       window.broadcaster.on('-thread-created', this._on_thread_created.bind(this));
+      window.broadcaster.on('range-created', this._on_range_created.bind(this));
     },
     _on_thread_created: function(thread) {
       this._threads.push(thread);
@@ -40,6 +41,10 @@
       this._threads.forEach(function(thread) {
         thread.destroy();
       }, this);
+    },
+    _on_range_created: function(start, interval) {
+      this.start = start;
+      this.interval = interval;
     },
     debug: function() {
       console.log('[' + (new Date().getTime()) - this._start + ']' + arguments);
