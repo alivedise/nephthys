@@ -2,6 +2,11 @@ body {
   position: relative;
 }
 
+div.btn-group.bootstrap-select.show-tick.input-xlarge {
+  padding-top: 1.5rem;
+  opacity: 0.7;
+}
+
 textarea {
   background-color: grey;
   color: silver;
