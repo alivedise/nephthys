@@ -52,15 +52,20 @@
       var y1 = source.attrs['y'] + task.offsetY;
       var x2 = source.attrs['x'];
       var y2 = target.attrs['y'] + parent.offsetY;
+      var arrow;
       if (y1 < y2) {
         y1 = y1 + source.attr('height') / 2;
         y2 = y2 + target.attr('height') / 2;
+
+        arrow = this._canvas.arrow(x1, y1, x2, y2, 1,
+                                     'silver');
       } else {
         y1 = y1 + source.attr('height') / 2;
         y2 = y2 - target.attr('height') / 2;
-      }
-      var arrow = this._canvas.arrow(x1, y1, x2, y2, 1,
+
+        arrow = this._canvas.arrow(x1, y1, x2, y2, 1,
                                      window.app.colorManager.getColor(this.id));
+      }
       set.push(arrow[0], arrow[1]);
       arrow[0].data('source', task);
       arrow[1].data('target', parent);
