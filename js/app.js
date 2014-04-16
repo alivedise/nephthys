@@ -6,7 +6,7 @@
   };
 
   App.prototype = {
-    VERSION: '0.6.3',
+    VERSION: '0.6.4',
     init: function() {
       this._start = new Date().getTime();
       this.layoutController = new LayoutController();

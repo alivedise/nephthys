@@ -18,7 +18,7 @@
       return;
     }
     this._processes.forEach(function(process) {
-      var processElement = $('<div class="process" data-id="' + process.processId + '"><span style="color: ' +
+      var processElement = $('<div class="process" data-id="' + (process.processId || process.id) + '"><span style="color: ' +
         this.app.colorManager.getColor(process.processId || process.id) + '">█ </span><span>' +
         (process.processName || process.name || process.processId || process.id) + '</span></div>');
       $(this.containerElement).append(processElement);
