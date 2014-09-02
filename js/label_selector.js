@@ -7,22 +7,28 @@
     this.element.selectpicker('hide');
     this.element.selectpicker('setStyle', 'label-selector', 'add');
     window.broadcaster.on('profile-imported', this.init.bind(this));
-    window.broadcaster.on('-label-rendered', this.addLabel.bind(this));
+    window.broadcaster.on('-labels-rendered', this.addLabels.bind(this));
+    window.broadcaster.on('-task-render-complete', this.dumpLabels.bind(this));
   };
   LabelSelector.prototype = new EventEmitter();
-LabelSelector.prototype.containerElement = $('body');
+  LabelSelector.prototype.containerElement = $('body');
   LabelSelector.prototype.init = function() {
     this._labels = [];
+    this._labelOptionsString = '';
     this.element.html('');
   };
 
-  LabelSelector.prototype.addLabel = function(label) {
-    if (this._labels.indexOf(label) < 0) {
-      this._labels.push(label);
-    } else {
-      return;
-    }
-    this.element.append('<option value="' + label + '">' + label + '</option>');
+  LabelSelector.prototype.addLabels = function(labels) {
+    labels.forEach(function(label) {
+      label = label.label || label[1];
+      if (this._labels.indexOf(label) < 0) {
+        this._labels.push(label);
+        this._labelOptionsString += '<option value="' + label + '">' + label + '</option>';
+      }
+    }, this);
+  };
+  LabelSelector.prototype.dumpLabels = function() {
+    this.element.append(this._labelOptionsString);
     this.element.selectpicker('show').selectpicker('refresh');
   };
   LabelSelector.prototype.render = function() {

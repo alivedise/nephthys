@@ -6,8 +6,9 @@
     this.render();
     this.element.hide();
     window.broadcaster.on('profile-imported', this.init.bind(this));
-    window.broadcaster.on('-label-rendered', this.addLabel.bind(this));
+    window.broadcaster.on('-labels-rendered', this.addLabels.bind(this));
     window.broadcaster.on('-task-rendered', this.addTask.bind(this));
+    window.broadcaster.on('-task-render-complete', this.dumpLabels.bind(this));
   };
   LabelToolBar.prototype = new EventEmitter();
   LabelToolBar.prototype.containerElement = $('body');
@@ -18,12 +19,15 @@
     this.labelCountSelector.text(this._labels.length);
     this.element.show();
   };
-  LabelToolBar.prototype.addLabel = function(label) {
-    if (this._labels.indexOf(label) < 0) {
-      this._labels.push(label);
-    } else {
-      return;
-    }
+  LabelToolBar.prototype.addLabels = function(labels) {
+    labels.forEach(function(label) {
+      label = label.label || label[1];
+      if (this._labels.indexOf(label) < 0) {
+        this._labels.push(label);
+      }
+    }, this);
+  };
+  LabelToolBar.prototype.dumpLabels = function() {
     this.labelCountSelector.text(this._labels.length);
   };
   LabelToolBar.prototype.addTask = function(task) {

@@ -468,7 +468,6 @@
   };
   Thread.prototype.renderTasks = function() {
     /* Render tasks */
-
     var self = this;
     var tasks = this.config.tasks;
     var ColorManager = window.app.colorManager;
@@ -541,8 +540,8 @@
         circles.push(this._canvas.circle(x, y + this._taskHeight / 2, 1)
                     .attr('fill', 'red')
                     .attr('stroke', 'transparent').data('timestamp', label.timestamp || label[0]));
-        window.broadcaster.emit('-label-rendered', label.label || label[1]);
       }, this);
+      window.broadcaster.emit('-labels-rendered', task.labels);
     }
 
     var set = this._canvas.setFinish();

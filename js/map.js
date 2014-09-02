@@ -115,10 +115,10 @@
         this._currentThreads = object.threads;
         window.app.processManager.update(object);
       }
-      window.broadcaster.emit('tasks-initing', this.currentTasks);
 
       this.buildThreads();
       this.buildSourceEvents();
+      window.broadcaster.emit('tasks-initing', this.currentTasks, this._ignoredTasks);
 
       this.render();
     },
@@ -131,11 +131,14 @@
 
     buildThreads: function() {
       this.currentThreads = {};
-      this.currentProcessThreads = {}
-      if (!this.currentTasks)
+      this.currentProcessThreads = {};
+      this._ignoredTasks = [];
+      if (!this.currentTasks) {
         return;
+      }
       this.currentTasks.forEach(function iterator(task) {
         if (!task.threadId) {
+          this._ignoredTasks.push(task);
           return;
         }
         if (!this.currentThreads[task.threadId]) {

@@ -6,7 +6,7 @@
   };
 
   App.prototype = {
-    VERSION: '0.6.4',
+    VERSION: '0.6.5',
     init: function() {
       this._start = new Date().getTime();
       this.layoutController = new LayoutController();
@@ -18,7 +18,7 @@
       this.taskManager = new TaskManager(this);
       this.threadManager = new ThreadManager(this);
       this.processManager = new ProcessManager(this);
-      // this.progress = new Progress(this);
+      this.progress = new Progress(this);
       this.scaleToolBar = new ScaleToolBar(this);
       this.labelToolBar = new LabelToolBar(this);
       this.labelSelector = new LabelSelector(this);
