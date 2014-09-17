@@ -50,6 +50,11 @@
         });
       });
       window.addEventListener('ui-resize', this.resize.bind(this));
+      window.broadcaster.on('profile-downloaded', function(profile) {
+        window.broadcaster.emit('profile-imported-stage-0');
+        window.broadcaster.emit('profile-imported', profile);
+        self.parse(profile);
+      }.bind(this));
     },
 
     publish: function(event, detail) {
@@ -66,7 +71,7 @@
         reader.onload = (function(theFile) {
           return function(e) {
             window.broadcaster.emit('profile-imported-stage-0');
-            window.broadcaster.emit('profile-imported');
+            window.broadcaster.emit('profile-imported', e.target.result);
             self.parse(e.target.result);
           };
         })(f);

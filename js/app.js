@@ -6,7 +6,8 @@
   };
 
   App.prototype = {
-    VERSION: '0.6.5',
+    VERSION: '0.7.0',
+    REMOTE: 'https://popping-fire-7165.firebaseio.com/tasks',
     init: function() {
       this._start = new Date().getTime();
       this.layoutController = new LayoutController();
@@ -24,6 +25,8 @@
       this.labelSelector = new LabelSelector(this);
       this.threadToggler = new ThreadToggler(this);
       this.setupDialog = new SetupDialog(this);
+      this.uploadToolBar = new UploadToolBar(this);
+      this.uploadDialog = new UploadDialog(this);
       this.register();
 
       Isis.init();

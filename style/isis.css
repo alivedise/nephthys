@@ -192,6 +192,18 @@ fieldset[disabled] .btn-sample.active {
 }
 
 /* Scale */
+#uploadToolBar {
+  position: absolute;
+  bottom: 50px;
+  left: 50px;
+  z-index: 99999;
+}
+
+.modal-body input {
+  width: 100%;
+}
+
+/* Scale */
 #scaleToolbar {
   position: absolute;
   bottom: 50px;
