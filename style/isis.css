@@ -214,8 +214,8 @@ fieldset[disabled] .btn-sample.active {
 /* Thread toggle */
 #toggler {
   position: absolute;
-  bottom: 50px;
-  left: 95px;
+  bottom: 80px;
+  right: 5px;
   z-index: 99999;
 }
 
@@ -223,7 +223,7 @@ fieldset[disabled] .btn-sample.active {
 #label-toolbar {
   position: absolute;
   bottom: 50px;
-  right: 110px;
+  right: 125px;
   z-index: 99999;
   opacity: 0.5;
 }

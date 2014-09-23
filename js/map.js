@@ -43,8 +43,11 @@
       this.mapContainer = document.getElementById('mapContainer');
       this.slideContainer = $('#slideContainer');
       var self = this;
-      $('#choose').change(function(evt) {
-        self.read(evt);
+      $(function() {
+        $('input[type=file]').bootstrapFileInput();
+        $('#choose').change(function(evt) {
+          self.read(evt);
+        });
       });
       window.addEventListener('ui-resize', this.resize.bind(this));
       window.broadcaster.on('profile-downloaded', function(profile) {

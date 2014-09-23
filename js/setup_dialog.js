@@ -13,7 +13,7 @@
     }.bind(this));
     window.broadcaster.on('profile-download-failed', function() {
       this.context.text('Profile download failed, please try to import from a file.');
-      this.chooseWrapper && this.chooseWrapper.removeClass('disabled');
+      this.choose.parent().removeClass('disabled');
     }.bind(this));
   };
   SetupDialog.prototype = new EventEmitter();
@@ -31,19 +31,14 @@
       keyboard: false
     });
     this.choose = $('#choose');
+    // We should launch the input here but we cannot.
+    // this.choose.bootstrapFileInput();
     this.context = this.element.find('.modal-body');
     if (this.downloader.state === 'downloading') {
       this.context.text('Downloading profile...');
+      this.choose.parent().addClass('disabled');
     }
     this.closeButton = this.element.find('.close').hide();
-    var self = this;
-    $(function() {
-      $('input[type=file]').bootstrapFileInput();
-      self.chooseWrapper = self.choose.parent();
-      if (self.downloader.state == 'downloading') {
-        self.chooseWrapper.addClass('disabled');
-      }
-    });
   };
   SetupDialog.prototype.template = function() {
     return '<div class="modal fade" id="setup-dialog" tabindex="-1" role="dialog" aria-labelledby="setupDialog" aria-hidden="true">' +
