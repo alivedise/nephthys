@@ -9,10 +9,10 @@
       this.element.modal('hide');
     }.bind(this));
     window.broadcaster.on('profile-downloaded', function() {
-      this.statusElement.text('Profile downloaded, parsing..');
+      this.context.text('Profile downloaded, parsing..');
     }.bind(this));
     window.broadcaster.on('profile-download-failed', function() {
-      this.statusElement.text('Profile download failed, please try to import from a file.');
+      this.context.text('Profile download failed, please try to import from a file.');
       this.chooseWrapper && this.chooseWrapper.removeClass('disabled');
     }.bind(this));
   };
@@ -26,17 +26,14 @@
       return;
     }
     this.containerElement.append(this.template());
-    if (window.prettyPrint) {
-      prettyPrint();
-    }
     this.element = $('#setup-dialog');
     this.element.modal({
       keyboard: false
     });
     this.choose = $('#choose');
-    this.statusElement = this.element.find('#setup-status');
+    this.context = this.element.find('.modal-body');
     if (this.downloader.state === 'downloading') {
-      this.statusElement.text('Downloading profile...');
+      this.context.text('Downloading profile...');
     }
     this.closeButton = this.element.find('.close').hide();
     var self = this;
@@ -57,19 +54,8 @@
                     '<h4 class="modal-title" id="myModalLabel">Isis ' + this.app.VERSION + ' TaskTracer GUI</h4>' +
                   '</div>' +
                   '<div class="modal-body">' +
-                    '<h5>How to enable task tracer?</h5>' +
-                    '<ol>' +
-                      '<li>in your <code>.userconfig</code>' +
-                        '<pre class="prettyprint">export MOZ_TASK_TRACER=1</pre>' +
-                      '</li>' +
-                      '<li>Add your own label if necessary.' +
-                        '<pre class="prettyprint">dump("ttd: my label");</pre>' +
-                      '</li>' +
-                      '<li>Get the profile</li>' +
-                    '</ol>' +
                   '</div>' +
                   '<div class="modal-footer">' +
-                    '<span class="pull-left" id="setup-status"></span>' +
                     '<input class="btn-warning" id="choose" type="file" title="Import profile" />' +
                   '</div>' +
                 '</div>' +
