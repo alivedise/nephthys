@@ -49,6 +49,7 @@
                     '<h4 class="modal-title" id="myModalLabel">Isis ' + this.app.VERSION + ' TaskTracer GUI</h4>' +
                   '</div>' +
                   '<div class="modal-body">' +
+                  '<span>About TaskTracer: <a target="blank" href="http://wiki.mozilla.org/TaskTracer">http://wiki.mozilla.org/TaskTracer</a></span>' +
                   '</div>' +
                   '<div class="modal-footer">' +
                     '<input class="btn-warning" id="choose" type="file" title="Import profile" />' +
