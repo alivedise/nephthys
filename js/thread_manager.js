@@ -6,6 +6,22 @@
     window.broadcaster.on('profile-imported-stage-0', this.init.bind(this));
     window.broadcaster.on('-thread-created', this.addThread.bind(this));
     window.broadcaster.on('process-focused', this.focusThread.bind(this));
+    window.broadcaster.on('range-created', this.initialWidth.bind(this));
+    /** Trigger tooltip for tasks */
+    this.element.mousedown(function(evt) {
+      if (!this._canvas) {
+        return;
+      }
+      var x = evt.pageX;
+      var y = evt.pageY;
+      var ele = this._canvas.getElementByPoint(x, y);
+      if (ele && ele.data('task')) {
+        window.broadcaster.emit('-task-hovered', ele.data('task'));
+      } else {
+        window.broadcaster.emit('-task-out');
+      }
+    }.bind(this));
+
     /** Trigger tooltip for tasks */
     this.element.mousemove(function(evt) {
       if (!this._canvas) {
@@ -15,9 +31,9 @@
       var y = evt.pageY;
       var ele = this._canvas.getElementByPoint(x, y);
       if (ele && ele.data('task')) {
-        window.broadcaster.emit('-task-hovered', ele.data('task'), x, y);
+        this.element.addClass('clickable');
       } else {
-        window.broadcaster.emit('-task-out');
+        this.element.removeClass('clickable');
       }
     }.bind(this));
 
@@ -70,9 +86,6 @@
   };
   ThreadManager.prototype = new EventEmitter();
   ThreadManager.prototype.getCanvas = function() {
-    if (!this.WIDTH) {
-      this.WIDTH = this.element.width();
-    }
     if (!this._canvas) {
       this._canvas =
         Raphael(document.getElementById('canvas'),
@@ -143,5 +156,8 @@
     }
   };
   ThreadManager.prototype.TIMEOUT = 100;
+  ThreadManager.prototype.initialWidth = function(start, interval) {
+    this.WIDTH = this.element.width();
+  };
   exports.ThreadManager = ThreadManager;
 }(this));

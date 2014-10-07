@@ -152,7 +152,8 @@
 
     this.placeTasks();
 
-    this.WIDTH = this.containerElement.width();
+    this.WIDTH = this.containerElement.children().width();
+    console.log(this.WIDTH);
     var num_bags = this.levelStarts[this.levelStarts.length - 1];
     this.MINIMAP_HEIGHT = Math.max(num_bags, 18);
     if (num_bags) {

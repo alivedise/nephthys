@@ -6,7 +6,7 @@
   };
 
   App.prototype = {
-    VERSION: '0.7.5',
+    VERSION: '0.7.6',
     REMOTE: 'https://popping-fire-7165.firebaseio.com/tasks',
     init: function() {
       this._start = new Date().getTime();
@@ -15,7 +15,7 @@
       this.colorManager = new ColorManager();
       this.broadcaster = window.broadcaster;
       this.timeline = new Timeline();
-      this.tooltip = new Tooltip(this);
+      this.taskDetailPanel = new TaskDetailPanel(this);
       this.taskManager = new TaskManager(this);
       this.threadManager = new ThreadManager(this);
       this.processManager = new ProcessManager(this);

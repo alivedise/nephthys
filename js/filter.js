@@ -68,7 +68,7 @@
   proto.addToTypeSelector = function addToTypeSelector(sourceEventType) {
     var type = sourceEventType.type;
     this._sourceEventTypes[type] = sourceEventType;
-    this.typeSelector.append('<option value="' + type + '">' + Mapping[Number(type)] + '</option>');
+    this.typeSelector.append('<option value="' + type + '">' + sourceEventType.name + '</option>');
     $('select').selectpicker('refresh');
   };
 

@@ -1,7 +1,9 @@
 (function(exports) {
+  var Mapping = ['UNKNOWN', 'TOUCH', 'MOUSE', 'KEY', 'BLUETOOTH', 'UNIXSOCKET', 'WIFI'];
   var SourceEventType = function(config) {
     this.config = config;
     this.type = config.type;
+    this.name = Mapping[Number(config.type)];
     this.init();
     window.broadcaster.emit('-source-event-type-created', this);
   };

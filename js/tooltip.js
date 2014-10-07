@@ -14,10 +14,11 @@
   Tooltip.prototype.template = function() {
     return '<div class="alert alert-info isis-tooltip" id="isis-tooltip">' +
               '<div><input type="checkbox" name="tooltip-source-event-id" value="" /></button><label>Show relavant tasks only.</label></div>' +
-              '<div><span>Name</span><span class="name label label-default pull-right"></span></div>' +
+              '<div><span>Name</span><h4 class="name"></h4></div>' +
               '<div><span>TaskID</span><span class="taskId label label-default pull-right"></span></div>' +
               '<div><span>SourceEventType</span><span class="sourceEventType label label-default pull-right"></span></div>' +
               '<div><span>SourceEventID</span><span class="label label-default pull-right"><span class="colorSample">█ </span><span class="sourceEventId"></span></span></div>' +
+              '<div><span>Start</span><span class="start label label-info pull-right"></span></div>' +
               '<div><span>Latency</span><span class="latency label label-info pull-right"></span></div>' +
               '<div><span>Execution</span><span class="execution label label-info pull-right"></span></div>' +
               '<div><span>Thread ID of parent task</span><span class="parent-task-thread-id label label-info pull-right"></span></div>' +
@@ -70,6 +71,7 @@
       this.element.find('.sourceEventId').text(task.sourceEventId);
       this.element.find('.sourceEventType').text(task.sourceEventType);
       this.element.find('.execution').text(task.end - task.start);
+      this.element.find('.start').text(task.start);
       this.element.find('.latency').text(task.start - task.dispatch);
       this.element.find('.colorSample').css({ color: window.app.colorManager.getColor(task.sourceEventId)});
       if (task.parentTask) {
@@ -91,8 +93,8 @@
       this.element.show().css(position);
     }.bind(this));
     window.broadcaster.on('-task-out', function(task, x, y) {
-      this.element.find('.taskId').text("");
-      this.element.hide();
+      //this.element.find('.taskId').text("");
+      //this.element.hide();
     }.bind(this));
   };
 
@@ -102,20 +104,20 @@
   Tooltip.prototype.getProperLayout = function(x, y, w, h) {
     var MAX_W = Math.abs(window.innerWidth - x);
     var MAX_H = Math.abs(window.innerHeight - y);
-    var W = Math.max(this.MAX_WIDTH, w);
+    var W = Math.min(this.MAX_WIDTH, w);
     W = Math.min(MAX_W, W);
-    var H = Math.max(this.MAX_HEIGHT, h);
+    var H = Math.min(this.MAX_HEIGHT, h);
     H = Math.min(MAX_H, H);
     if (window.innerWidth > x * 2 && window.innerHeight > y * 2) {
       return {
-        left: x,
-        top: y,
+        left: x - W/2,
+        top: y + 5,
         width: W,
         height: H
       };
     } else if (window.innerWidth > x * 2 && window.innerHeight < y * 2) {
       return {
-        left: x,
+        left: x - W/2,
         top: y - H,
         width: W,
         height: H
@@ -130,7 +132,7 @@
     } else {
       return {
         left: x - W,
-        top: y,
+        top: y + 5,
         width: W,
         height: H
       };
