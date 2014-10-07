@@ -1,6 +1,8 @@
 'use strict';
 
 (function(exports) {
+  var Mapping = ['UNKNOWN', 'TOUCH', 'MOUSE', 'KEY', 'BLUETOOTH', 'UNIXSOCKET', 'WIFI'];
+
   function Filter(config) {
     this.config = config;
     this.init();
@@ -66,7 +68,7 @@
   proto.addToTypeSelector = function addToTypeSelector(sourceEventType) {
     var type = sourceEventType.type;
     this._sourceEventTypes[type] = sourceEventType;
-    this.typeSelector.append('<option value="' + type + '">' + type + '</option>');
+    this.typeSelector.append('<option value="' + type + '">' + Mapping[Number(type)] + '</option>');
     $('select').selectpicker('refresh');
   };
 

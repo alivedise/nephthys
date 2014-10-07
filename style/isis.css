@@ -169,7 +169,7 @@ fieldset[disabled] .btn-sample.active {
 /* filter */
 #filter {
   position: absolute;
-  top: 5px;
+  top: 45px;
   left: 220px;
   z-index: 99999;
 }
