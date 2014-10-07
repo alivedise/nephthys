@@ -3,8 +3,13 @@ body {
 }
 
 div.btn-group.bootstrap-select.show-tick.input-xlarge {
-  padding-top: 1.5rem;
-  opacity: 0.7;
+  padding-right: 0.2rem;
+  padding-top: 0.2rem;
+  opacity: 1;
+}
+
+div.layout-north {
+  background-color: black;
 }
 
 textarea {
@@ -164,15 +169,15 @@ fieldset[disabled] .btn-sample.active {
 /* filter */
 #filter {
   position: absolute;
-  bottom: 65px;
-  left: 5px;
+  top: 5px;
+  left: 220px;
   z-index: 99999;
 }
 
 #filterToolbar {
   position: absolute;
-  bottom: 50px;
-  left: 5px;
+  bottom: 5px;
+  left: 220px;
   z-index: 99999;
   cursor: pointer;
 }
@@ -194,8 +199,8 @@ fieldset[disabled] .btn-sample.active {
 /* Scale */
 #uploadToolBar {
   position: absolute;
-  bottom: 50px;
-  left: 50px;
+  bottom: 5px;
+  left: 262px;
   z-index: 99999;
 }
 
@@ -206,7 +211,7 @@ fieldset[disabled] .btn-sample.active {
 /* Scale */
 #scaleToolbar {
   position: absolute;
-  bottom: 50px;
+  top: 5px;
   right: 5px;
   z-index: 99999;
 }
@@ -214,18 +219,17 @@ fieldset[disabled] .btn-sample.active {
 /* Thread toggle */
 #toggler {
   position: absolute;
-  bottom: 80px;
-  right: 5px;
+  bottom: 5px;
+  left: 305px;
   z-index: 99999;
 }
 
 /* label toolbar */
 #label-toolbar {
   position: absolute;
-  bottom: 50px;
+  top: 5px;
   right: 125px;
   z-index: 99999;
-  opacity: 0.5;
 }
 
 /* label selector */

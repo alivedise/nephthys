@@ -11,7 +11,7 @@
     window.broadcaster.on('-task-render-complete', this.dumpLabels.bind(this));
   };
   LabelSelector.prototype = new EventEmitter();
-  LabelSelector.prototype.containerElement = $('body');
+  LabelSelector.prototype.containerElement = $('.layout-north');
   LabelSelector.prototype.init = function() {
     this._labels = [];
     this._labelOptionsString = '';

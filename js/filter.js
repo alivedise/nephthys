@@ -9,7 +9,7 @@
   Filter.prototype.constructor = Filter;
 
   var proto = Filter.prototype;
-  proto.containerElement = $('body');
+  proto.containerElement = $('.layout-north');
 
   proto.render = function() {
     if (this.element) {

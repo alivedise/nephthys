@@ -20,7 +20,7 @@
     window.broadcaster.on('profile-imported', this.init.bind(this));
   };
   UploadToolBar.prototype = new EventEmitter();
-  UploadToolBar.prototype.containerElement = $('body');
+  UploadToolBar.prototype.containerElement = $('.layout-north');
   UploadToolBar.prototype.SCALE = 2;
   UploadToolBar.prototype.init = function(profile) {
     this.profile = profile;

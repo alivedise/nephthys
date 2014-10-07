@@ -11,7 +11,7 @@
     window.broadcaster.on('-task-render-complete', this.dumpLabels.bind(this));
   };
   LabelToolBar.prototype = new EventEmitter();
-  LabelToolBar.prototype.containerElement = $('body');
+  LabelToolBar.prototype.containerElement = $('.layout-north');
   LabelToolBar.prototype.init = function() {
     this._labels = [];
     this._tasks = [];
@@ -53,11 +53,6 @@
     $('#clear-filter').click(function() {
       window.broadcaster.emit('-filter-cleared');
     });
-    this.element.hover(function() {
-      this.element.css({ opacity: 1.0 })
-    }.bind(this), function() {
-      this.element.css({ opacity: 0.5 })
-    }.bind(this));
   };
   LabelToolBar.prototype.template = function() {
     return '<div class="btn-group" id="label-toolbar">' +

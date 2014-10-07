@@ -12,7 +12,7 @@
     },
     layout: {
       filter: 0,
-      header: 50,
+      header: 40,
       timeline: 20,
       info: 40
     },
@@ -28,6 +28,7 @@
         center__paneSelector: ".layout-center"
         , north__paneSelector:   ".layout-north"
         , north__size:       this.layout.header
+        , north__showOverflowOnHover:    true
         , spacing_open:     1  // ALL panes
         , spacing_closed:     1 // ALL panes
         // MIDDLE-LAYOUT (child of outer-center-pane)

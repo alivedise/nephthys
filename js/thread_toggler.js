@@ -8,7 +8,7 @@
     window.broadcaster.on('profile-imported', this.init.bind(this));
   };
   ThreadToggler.prototype = new EventEmitter();
-  ThreadToggler.prototype.containerElement = $('body');
+  ThreadToggler.prototype.containerElement = $('.layout-north');
   ThreadToggler.prototype.init = function() {
     this.element.show();
   };

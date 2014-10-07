@@ -6,7 +6,7 @@
   };
 
   App.prototype = {
-    VERSION: '0.7.3',
+    VERSION: '0.7.4',
     REMOTE: 'https://popping-fire-7165.firebaseio.com/tasks',
     init: function() {
       this._start = new Date().getTime();

@@ -11,7 +11,7 @@
     }.bind(this))
   };
   ScaleToolBar.prototype = new EventEmitter();
-  ScaleToolBar.prototype.containerElement = $('body');
+  ScaleToolBar.prototype.containerElement = $('.layout-north');
   ScaleToolBar.prototype.SCALE = 2;
   ScaleToolBar.prototype.init = function() {
     this.element.show();
