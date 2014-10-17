@@ -67,7 +67,7 @@
       }
       this.element.find('.labels').remove();
       this.element.find('.taskId').text(task.taskId || task.id);
-      this.element.find('.name').text(task.name);
+      this.element.find('.name').text(task.name || '(NULL)');
       this.element.find('.sourceEventId').text(task.sourceEventId);
       this.element.find('.sourceEventType').text(Mapping[Number(task.sourceEventType)]);
       this.element.find('.start').text(task.start);
