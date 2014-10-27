@@ -54,6 +54,15 @@
       return;
     }
     this._registered = true;
+    this.element.find('.parent-task-thread-id').click(function() {
+      var parentId = this.element.find('.parent-task-thread-id').text();
+      var tasks = window.app.taskManager.getTasks();
+      var task = tasks[parentId];
+      if (!task) {
+        return;
+      }
+      window.broadcaster.emit('focus-task', task.view.execution);
+    }.bind(this));
 
     window.broadcaster.on('-task-hovered', function(task) {
       this.element.data('task', task);
@@ -74,8 +83,8 @@
       this.element.find('.execution').text(task.end - task.start);
       this.element.find('.latency').text(task.start - task.dispatch);
       this.element.find('.colorSample').css({ color: window.app.colorManager.getColor(task.sourceEventId)});
-      if (task.parentTask) {
-        this.element.find('.parent-task-thread-id').text(task.parentTask.threadId).css({ backgroundColor: window.app.colorManager.getColor(task.parentTask.threadId)});
+      if (task.parentTaskId) {
+        this.element.find('.parent-task-thread-id').text(task.parentTaskId).css({ backgroundColor: window.app.colorManager.getColor(task.parentTaskId)});
       } else {
         this.element.find('.parent-task-thread-id').text('');
       }

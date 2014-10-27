@@ -6,7 +6,7 @@
   };
 
   App.prototype = {
-    VERSION: '0.7.7',
+    VERSION: '0.7.8',
     REMOTE: 'https://popping-fire-7165.firebaseio.com/tasks',
     init: function() {
       var param = URI.parseQuery(URI(window.location.href).query());

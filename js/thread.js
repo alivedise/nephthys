@@ -153,7 +153,6 @@
     this.placeTasks();
 
     this.WIDTH = this.containerElement.children().width();
-    console.log(this.WIDTH);
     var num_bags = this.levelStarts[this.levelStarts.length - 1];
     
     if (num_bags && !window.app.shrink) {

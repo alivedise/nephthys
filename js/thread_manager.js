@@ -7,6 +7,10 @@
     window.broadcaster.on('-thread-created', this.addThread.bind(this));
     window.broadcaster.on('process-focused', this.focusThread.bind(this));
     window.broadcaster.on('range-created', this.initialWidth.bind(this));
+    window.broadcaster.on('focus-task', function(ele) {
+      this.blurTask();
+      this.focusTask(ele);
+    }.bind(this));
     /** Trigger tooltip for tasks */
     this.element.mousedown(function(evt) {
       if (!this._canvas) {
@@ -17,21 +21,8 @@
       var ele = this._canvas.getElementByPoint(x, y);
       if (ele && ele.data('task')) {
         window.broadcaster.emit('-task-hovered', ele.data('task'));
-        if (this.activeElement) {
-          this.activeElement.attr({'stroke-width': 0});
-          if (this.activeElement.data('execution')) {
-            this.activeElement.data('execution').attr({'stroke-width': 0});
-          } else if (this.activeElement.data('latency')) {
-            this.activeElement.data('latency').attr({'stroke-width': 0}).hide();
-          }
-        }
-        ele.attr({stroke: 'red', 'stroke-width': 2});
-        this.activeElement = ele;
-        if (this.activeElement.data('execution')) {
-          this.activeElement.data('execution').attr({'stroke-width': 2, 'stroke': 'red'});
-        } else if (this.activeElement.data('latency')) {
-          this.activeElement.data('latency').attr({'stroke-width': 1, 'stroke': 'red'}).show();
-        }
+        this.blurTask();
+        this.focusTask(ele);
       } else {
         window.broadcaster.emit('-task-out');
       }
@@ -100,6 +91,26 @@
     window.broadcaster.on('-thread-request-close', this.handleThreadClose.bind(this));
   };
   ThreadManager.prototype = new EventEmitter();
+  ThreadManager.prototype.blurTask = function(ele) {
+    if (this.activeElement) {
+      this.activeElement.attr({'stroke-width': 0});
+      if (this.activeElement.data('execution') && this.activeElement.data('execution') !== ele) {
+        this.activeElement.data('execution').attr({'stroke-width': 0});
+      } else if (this.activeElement.data('latency')  && this.activeElement.data('latency') !== ele) {
+        this.activeElement.data('latency').attr({'stroke-width': 0}).hide();
+      }
+    }
+  };
+  ThreadManager.prototype.focusTask = function(ele) {
+    this.activeElement = ele;
+    if (this.activeElement.data('execution')) {
+      this.activeElement.data('execution').attr({'stroke-width': 2, 'stroke': 'red'});
+      ele.attr({stroke: 'red', 'stroke-width': 1});
+    } else if (this.activeElement.data('latency')) {
+      this.activeElement.data('latency').attr({'stroke-width': 1, 'stroke': 'red'}).show();
+      ele.attr({stroke: 'red', 'stroke-width': 2});
+    }
+  };
   ThreadManager.prototype.getCanvas = function() {
     if (!this._canvas) {
       this._canvas =
