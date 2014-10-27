@@ -17,6 +17,21 @@
       var ele = this._canvas.getElementByPoint(x, y);
       if (ele && ele.data('task')) {
         window.broadcaster.emit('-task-hovered', ele.data('task'));
+        if (this.activeElement) {
+          this.activeElement.attr({'stroke-width': 0});
+          if (this.activeElement.data('execution')) {
+            this.activeElement.data('execution').attr({'stroke-width': 0});
+          } else if (this.activeElement.data('latency')) {
+            this.activeElement.data('latency').attr({'stroke-width': 0}).hide();
+          }
+        }
+        ele.attr({stroke: 'red', 'stroke-width': 2});
+        this.activeElement = ele;
+        if (this.activeElement.data('execution')) {
+          this.activeElement.data('execution').attr({'stroke-width': 2, 'stroke': 'red'});
+        } else if (this.activeElement.data('latency')) {
+          this.activeElement.data('latency').attr({'stroke-width': 1, 'stroke': 'red'}).show();
+        }
       } else {
         window.broadcaster.emit('-task-out');
       }

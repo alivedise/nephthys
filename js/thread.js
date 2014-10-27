@@ -155,11 +155,13 @@
     this.WIDTH = this.containerElement.children().width();
     console.log(this.WIDTH);
     var num_bags = this.levelStarts[this.levelStarts.length - 1];
-    this.MINIMAP_HEIGHT = Math.max(num_bags, 18);
-    if (num_bags) {
+    
+    if (num_bags && !window.app.shrink) {
+      this.MINIMAP_HEIGHT = Math.max(num_bags, 18);
       this.HEIGHT = (num_bags + 1) * (this._intervalH + this._taskHeight) + (num_bags);
     } else {
-      this.HEIGHT = 500;
+      this.MINIMAP_HEIGHT = 25;
+      this.HEIGHT = 75;
     }
     this._canvas = this.config.canvas;
     this.render();
@@ -512,7 +514,12 @@
     this._canvas.setStart();
     var lx = this.WIDTH * (task.dispatch - this.config.start) / this.config.interval;
     var ex = this.WIDTH * (task.start - this.config.start) / this.config.interval;
-    var y = task.place_y * (this._taskHeight + this._intervalH);
+    var y;
+    if (!window.app.shrink) {
+      y = task.place_y * (this._taskHeight + this._intervalH);
+    } else {
+      y = this._taskHeight + this._intervalH;
+    }
     var lw = (this.WIDTH) * (task.start - task.dispatch) / this.config.interval;
     var ew = (this.WIDTH) * (task.end - task.start) / this.config.interval;
     var h = this._taskHeight;
@@ -524,13 +531,18 @@
                               .attr('fill', c)
                               .attr('opacity', 0.5)
                               .attr('stroke-width', 0)
-                              .data('task', task);
+                              .data('task', task)
+                              .data('type', 'latency').hide();
 
     /** Render execution **/
     var execution = this._canvas.rect(ex, y, ew, h)
                                 .attr('fill', c)
                                 .attr('stroke-width', 0)
-                                .data('task', task);
+                                .data('task', task)
+                                .data('type', 'execution')
+                                .data('latency', latency);
+
+    latency.data('execution', execution);
 
     var circles = [];
 
@@ -559,7 +571,13 @@
     task.rendered = true;
 
     /* Render MINIMAP */
-    var pathString = 'M' + ex + ',' + task.place_y + 'L' + (ex + ew) + ',' + task.place_y;
+    var mini_y;
+    if (window.app.shrink) {
+      mini_y = '0';
+    } else {
+      mini_y = task.place_y;
+    }
+    var pathString = 'M' + ex + ',' + mini_y + 'L' + (ex + ew) + ',' + mini_y;
     var mini_task = this._canvas.path(pathString)
                                 .attr('stroke', c);
     mini_task.transform('t0,' + this.config.offsetY);
