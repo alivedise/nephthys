@@ -531,7 +531,11 @@
                               .attr('opacity', 0.5)
                               .attr('stroke-width', 0)
                               .data('task', task)
-                              .data('type', 'latency').hide();
+                              .data('type', 'latency');
+
+    if (window.app.shrink) {
+      latency.hide();
+    }
 
     /** Render execution **/
     var execution = this._canvas.rect(ex, y, ew, h)
