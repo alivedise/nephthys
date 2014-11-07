@@ -46,7 +46,7 @@
                 '<div class="modal-content">' +
                   '<div class="modal-header">' +
                     '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-                    '<h4 class="modal-title" id="myModalLabel">Isis ' + this.app.VERSION + ' TaskTracer GUI</h4>' +
+                    '<h4 class="modal-title" id="myModalLabel">Nephthys ' + this.app.VERSION + ' TaskTracer GUI</h4>' +
                   '</div>' +
                   '<div class="modal-body">' +
                   '<span>About TaskTracer: <a target="blank" href="http://wiki.mozilla.org/TaskTracer">http://wiki.mozilla.org/TaskTracer</a></span>' +
