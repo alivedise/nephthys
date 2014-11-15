@@ -54,6 +54,16 @@
       return;
     }
     this._registered = true;
+    this.element.find('.taskId').click(function() {
+      var parentId = this.element.find('.taskId').text();
+      var tasks = window.app.taskManager.getTasks();
+      var task = tasks[parentId];
+      if (!task) {
+        return;
+      }
+      window.broadcaster.emit('focus-task', task.view.execution);
+      window.broadcaster.emit('thread-focused', task.threadId);
+    }.bind(this));
     this.element.find('.parent-task-thread-id').click(function() {
       var parentId = this.element.find('.parent-task-thread-id').text();
       var tasks = window.app.taskManager.getTasks();
@@ -62,6 +72,17 @@
         return;
       }
       window.broadcaster.emit('focus-task', task.view.execution);
+      window.broadcaster.emit('thread-focused', task.threadId);
+    }.bind(this));
+    this.element.find('.sourceEventId').click(function() {
+      var parentId = this.element.find('.sourceEventId').text();
+      var tasks = window.app.taskManager.getTasks();
+      var task = tasks[parentId];
+      if (!task) {
+        return;
+      }
+      window.broadcaster.emit('focus-task', task.view.execution);
+      window.broadcaster.emit('thread-focused', task.threadId);
     }.bind(this));
 
     window.broadcaster.on('-task-hovered', function(task) {
