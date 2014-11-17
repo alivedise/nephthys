@@ -22,7 +22,7 @@
               '<div><span>Start</span><span class="start label label-info pull-right"></span></div>' +
               '<div><span>Latency</span><span class="latency label label-info pull-right"></span></div>' +
               '<div><span>Execution</span><span class="execution label label-info pull-right"></span></div>' +
-              '<div><span>Thread ID of parent task</span><span class="mayclick parent-task-thread-id label label-info pull-right"></span></div>' +
+              '<div><span>Task ID of parent task</span><span class="mayclick parent-task-thread-id label label-info pull-right"></span></div>' +
             '</div>';
   };
 
