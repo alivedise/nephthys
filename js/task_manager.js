@@ -24,5 +24,12 @@
     return this._tasks[id];
   };
 
+  TaskManager.prototype.focusTask = function(id) {
+    var task = this._tasks[id];
+    window.broadcaster.emit('focus-task', task.view.execution);
+    window.broadcaster.emit('thread-focused', task.threadId);
+    window.broadcaster.emit('-task-hovered', task);
+  };
+
   exports.TaskManager = TaskManager;
 }(this));
