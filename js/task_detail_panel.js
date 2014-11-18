@@ -16,13 +16,13 @@
     return '<div id="task-detail-panel">' +
               '<div><input type="checkbox" name="tooltip-source-event-id" value="" /></button><label>Show relavant tasks only.</label></div>' +
               '<div><span>Name</span><h4 class="name"></h4></div>' +
-              '<div><span>TaskID</span><span class="taskId label label-default pull-right"></span></div>' +
+              '<div><span>TaskID</span><span class="clickable taskId label label-default pull-right"></span></div>' +
               '<div><span>SourceEventType</span><span class="sourceEventType label label-default pull-right"></span></div>' +
-              '<div><span>SourceEventID</span><span class="label label-default pull-right"><span class="colorSample">█ </span><span class="sourceEventId"></span></span></div>' +
+              '<div><span>SourceEventID</span><span class="label label-default pull-right"><span class="colorSample">█ </span><span class="mayclick sourceEventId"></span></span></div>' +
               '<div><span>Start</span><span class="start label label-info pull-right"></span></div>' +
               '<div><span>Latency</span><span class="latency label label-info pull-right"></span></div>' +
               '<div><span>Execution</span><span class="execution label label-info pull-right"></span></div>' +
-              '<div><span>Task ID of parent task</span><span class="parent-task-thread-id label label-info pull-right"></span></div>' +
+              '<div><span>Task ID of parent task</span><span class="mayclick parent-task-thread-id label label-info pull-right"></span></div>' +
             '</div>';
   };
 
@@ -54,6 +54,18 @@
       return;
     }
     this._registered = true;
+    this._lastfocus = "";
+    this.element.find('.taskId').click(function() {
+      var taskId = this.element.find('.taskId').text();
+      var tasks = window.app.taskManager.getTasks();
+      var task = tasks[taskId];
+      if (!task) {
+        return;
+      }
+      window.broadcaster.emit('focus-task', task.view.execution);
+      window.broadcaster.emit('thread-focused', task.threadId);
+      this._lastfocus = "";
+    }.bind(this));
     this.element.find('.parent-task-thread-id').click(function() {
       var parentId = this.element.find('.parent-task-thread-id').text();
       var tasks = window.app.taskManager.getTasks();
@@ -62,9 +74,31 @@
         return;
       }
       window.broadcaster.emit('focus-task', task.view.execution);
+      window.broadcaster.emit('thread-focused', task.threadId);
+      if (this._lastfocus == "parentId") {
+        window.broadcaster.emit('-task-hovered', task);
+      } else {
+        this._lastfocus = "parentId";
+      }
+    }.bind(this));
+    this.element.find('.sourceEventId').click(function() {
+      var sourceEventId = this.element.find('.sourceEventId').text();
+      var tasks = window.app.taskManager.getTasks();
+      var task = tasks[sourceEventId];
+      if (!task) {
+        return;
+      }
+      window.broadcaster.emit('focus-task', task.view.execution);
+      window.broadcaster.emit('thread-focused', task.threadId);
+      if (this._lastfocus == "sourceEventId") {
+        window.broadcaster.emit('-task-hovered', task);
+      } else {
+        this._lastfocus = "sourceEventId";
+      }
     }.bind(this));
 
     window.broadcaster.on('-task-hovered', function(task) {
+      this._lastfocus = "";
       this.element.data('task', task);
       if (this.element.find('.taskId').text() === String(task.taskId || task.id)) {
         return;
@@ -87,6 +121,16 @@
         this.element.find('.parent-task-thread-id').text(task.parentTaskId).css({ backgroundColor: window.app.colorManager.getColor(task.parentTaskId)});
       } else {
         this.element.find('.parent-task-thread-id').text('');
+      }
+      if (window.app.taskManager.getTask(task.sourceEventId)) {
+	this.element.find('.sourceEventId').addClass('clickable');
+      } else {
+	this.element.find('.sourceEventId').removeClass('clickable');
+      }
+      if (window.app.taskManager.getTask(task.parentTaskId)) {
+	this.element.find('.parent-task-thread-id').addClass('clickable');
+      } else {
+	this.element.find('.parent-task-thread-id').removeClass('clickable');
       }
       if (task.labels && task.labels.length) {
         this.element.append('<div class="labels"><hr/></div>');

@@ -5,7 +5,8 @@
     this.app = app;
     window.broadcaster.on('profile-imported-stage-0', this.init.bind(this));
     window.broadcaster.on('-thread-created', this.addThread.bind(this));
-    window.broadcaster.on('process-focused', this.focusThread.bind(this));
+    window.broadcaster.on('process-focused', this.focusProcess.bind(this));
+    window.broadcaster.on('thread-focused', this.focusThread.bind(this));
     window.broadcaster.on('range-created', this.initialWidth.bind(this));
     window.broadcaster.on('focus-task', function(ele) {
       this.blurTask();
@@ -145,7 +146,7 @@
     }
     return name;
   };
-  ThreadManager.prototype.focusThread = function(processId) {
+  ThreadManager.prototype.focusProcess = function(processId) {
     if (!this._currentThreads) {
       return;
     }
@@ -156,6 +157,13 @@
         return;
       }
     }
+  };
+  ThreadManager.prototype.focusThread = function(threadId) {
+    if (!this._currentThreads) {
+      return;
+    }
+    document.getElementById('canvas').scrollTop =
+      this._threads[threadId].config.offsetY;
   };
   ThreadManager.prototype.updateUI = function() {
     var accumulatedHeight = 0;
