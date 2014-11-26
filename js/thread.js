@@ -523,6 +523,9 @@
     var ew = (this.WIDTH) * (task.end - task.start) / this.config.interval;
     var h = this._taskHeight;
     var c = sourceEventColor;
+    if (ew < this.WIDTH / this.config.interval) {
+      ew = this.WIDTH / this.config.interval;
+    }
 
     /** Render latency **/
     var width = (lw + ew) > this._taskMinWidth ? (lw + ew) : this._taskMinWidth;
@@ -597,6 +600,9 @@
       var ex = this.WIDTH * (task.start - start) / interval;
       var lw = (this.WIDTH) * (task.start - task.dispatch) / interval;
       var ew = (this.WIDTH) * (task.end - task.start) / interval;
+      if (ew < (this.WIDTH / interval)) {
+        ew = this.WIDTH / interval;
+      }
       task.view.latency.attr('x', lx).attr('width', lw);
       task.view.execution.attr('x', ex).attr('width', ew);
       task.view.circles.forEach(function(circle) {
