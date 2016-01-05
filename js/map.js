@@ -55,6 +55,13 @@
         window.broadcaster.emit('profile-imported', profile);
         self.parse(profile);
       }.bind(this));
+      window.addEventListener('message', function(event) {
+        if (event.data.name == 'Cleopatra::LoadData') {
+          window.broadcaster.emit('profile-downloaded', event.data.data);
+        } else {
+          console.log('Unknown message: ' + event.data.name);
+        }
+      }, false);
     },
 
     publish: function(event, detail) {
@@ -106,9 +113,14 @@
     renderTooltip: function() {
     },
 
-    parse: function Isis_parse(string) {
+    parse: function Isis_parse(stringOrJSON) {
       this.clear(true);
-      var object = JSON.parse(string);
+      var object;
+      if (typeof stringOrJSON === "string") {
+        object = JSON.parse(stringOrJSON);
+      } else {
+        object = stringOrJSON;
+      }
       this.start = object.start || object.begin;
       // XXX: fix me
       this.end = object.end;
